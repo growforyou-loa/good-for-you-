@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Reader — Good for You</title>
+<link rel="icon" href="favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="assets/images/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Poppins, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #000;
+  overflow: hidden;
+  color: #e5e7eb;
+}
+
+button, a, .page {
+  outline: none;
+}
+
+.page:active {
+  background: transparent;
+}
+
+/* ===== READER STAGE ===== */
+.reader {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 2600px;
+}
+
+/* ===== BOOK ===== */
+.book {
+  width: min(92vw, 380px);
+  height: min(92vh, 560px);
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+/* ===== PAGE ===== */
+.page {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-origin: left;
+  transform-style: preserve-3d;
+  transition: transform 1.15s cubic-bezier(.22, .61, .36, 1);
+  cursor: pointer;
+}
+
+/* ===== PAGE IMAGE ===== */
+.page img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #000;
+  backface-visibility: hidden;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* ===== BACK SIDE ===== */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #000;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+/* ===== FLIPPED ===== */
+.page.flipped {
+  transform: rotateY(-180deg);
+}
+
+/* ===== PAGE COUNTER ===== */
+.counter {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.9);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: .9rem;
+  display: none;
+  white-space: nowrap;
+}
+
+/* ===== FULLSCREEN BUTTON ===== */
+#fsBtn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  padding: 0;
+}
+#fsBtn:hover {
+  background: rgba(255,255,255,0.14);
+}
+</style>
+<script type="module" src="/firebase-auth.js"></script>
+<script type="module" src="/history.js"></script>
+<script type="module">
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+window.gfyLoadItem = async id => {
+  const snap = await getDoc(doc(gfyAuth.db, 'content', id));
+  if (!snap.exists() || snap.data().status !== 'published') throw { code: 'notfound' };
+  const item = snap.data();
+  if (item.access === 'members') {
+    const user = await new Promise(res => { gfyAuth.on('init', res); gfyAuth.init(); });
+    if (!user) throw { code: 'login' };
+    const u = await getDoc(doc(gfyAuth.db, 'users', gfyAuth.auth.currentUser.uid));
+    const d = u.exists() ? u.data() : {};
+    if (d.blocked) throw { code: 'blocked' };
+    if (!(d.libraryAccess || []).includes(id)) throw { code: 'noaccess' };
+  }
+  return item;
+};
+</script>
+</head>
+
+<body>
+
+<!-- ===== READER ===== -->
+<div class="reader" id="reader">
+  <div class="book" id="book"></div>
+</div>
+
+<div class="counter" id="counter">1 / 4</div>
+
+<!-- ===== FULLSCREEN BUTTON ===== -->
+<button id="fsBtn" title="Fullscreen">
+  <svg id="fsExpand" width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 3 21 3 21 9"/>
+    <polyline points="9 21 3 21 3 15"/>
+    <line x1="21" y1="3" x2="14" y2="10"/>
+    <line x1="3" y1="21" x2="10" y2="14"/>
+  </svg>
+  <svg id="fsShrink" width="16" height="16" viewBox="0 0 24 24" fill="none"
+    stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+    style="display:none">
+    <polyline points="4 14 10 14 10 20"/>
+    <polyline points="20 10 14 10 14 4"/>
+    <line x1="10" y1="14" x2="3" y2="21"/>
+    <line x1="21" y1="3" x2="14" y2="10"/>
+  </svg>
+</button>
+
+<script>
+/* ===== PAGES ===== */
+let pages = [
+  "assets/reader/images/subliminal-page1.jpg",
+  "assets/reader/images/subliminal-page2.jpg",
+  "assets/reader/images/subliminal-page3.jpg",
+  "assets/reader/images/subliminal-page4.jpg"
+];
+
+const book    = document.getElementById("book");
+const counter = document.getElementById("counter");
+const reader  = document.getElementById("reader");
+
+let current = 0;
+
+/* Show reader immediately — no login gate */
+reader.style.display = "flex";
+counter.style.display = "block";
+
+/* ===== CREATE PAGES ===== */
+function buildPages() {
+  book.innerHTML = "";
+  pages.forEach((src, i) => {
+    const page = document.createElement("div");
+    page.className = "page";
+    page.style.zIndex = pages.length - i;
+    const img = new Image();
+    img.src = src;
+    page.appendChild(img);
+    book.appendChild(page);
+  });
+  current = 0;
+  update();
+}
+
+function showMsg(text, href, label) {
+  counter.style.display = "none";
+  book.innerHTML = `<div style="color:#e5e7eb;text-align:center;padding:30px;font-family:Poppins,sans-serif;max-width:420px;margin:auto">
+    <p style="font-size:1rem;line-height:1.6;margin-bottom:18px">${text}</p>
+    ${href ? `<a href="${href}" style="color:#22d3ee;font-weight:600">${label}</a>` : ""}</div>`;
+}
+
+const itemId = new URLSearchParams(location.search).get("id");
+if (!itemId) {
+  buildPages();
+} else {
+  book.innerHTML = '<div style="color:#8b8fa8;font-family:Poppins,sans-serif">Loading…</div>';
+  const wait = setInterval(async () => {
+    if (!window.gfyLoadItem) return;
+    clearInterval(wait);
+    try {
+      const item = await gfyLoadItem(itemId);
+      document.title = item.title + " — Good for You";
+      window.gfyHist && gfyHist.add({ k: item.type === "poem" ? "poem" : "ebook", id: itemId, title: item.title, img: item.cover || (item.pages && item.pages[0]) || "", url: "/reader.html?id=" + itemId });
+      if (item.pages && item.pages.length) {
+        pages = item.pages;
+        counter.style.display = "block";
+        buildPages();
+      } else if (item.text) {
+        counter.style.display = "none";
+        const t = document.createElement("div");
+        t.style.cssText = "color:#e5e7eb;font-family:Poppins,sans-serif;white-space:pre-wrap;line-height:1.9;font-size:1.05rem;padding:30px 22px;max-width:560px;margin:auto;max-height:100vh;overflow:auto;text-align:center";
+        t.textContent = item.text;
+        book.innerHTML = "";
+        book.appendChild(t);
+      } else showMsg("This item has no content yet.");
+    } catch (e) {
+      if (e.code === "login") showMsg("🔒 This is for members. Please sign in to read.", "/login.html", "Sign in →");
+      else if (e.code === "noaccess") showMsg("🔒 You don't have access to this item yet.", "/contact.html", "Contact support →");
+      else if (e.code === "blocked") showMsg("Your account has been restricted.", "/contact.html", "Contact support →");
+      else if (e.code === "notfound") showMsg("This item isn't available.", "/ebooks.html", "← Back to library");
+      else showMsg("Couldn't load. Please try again.", "", "");
+    }
+  }, 50);
+}
+
+/* ===== NAVIGATION ===== */
+function next() {
+  const pg = document.querySelectorAll(".page");
+  if (current >= pages.length) return;
+  pg[current].classList.add("flipped");
+  current++;
+  update();
+}
+
+function prev() {
+  const pg = document.querySelectorAll(".page");
+  if (current <= 0) return;
+  current--;
+  pg[current].classList.remove("flipped");
+  update();
+}
+
+function update() {
+  counter.textContent = `${Math.max(current, 1)} / ${pages.length}`;
+  if (itemId && window.gfyHist && pages.length > 1) gfyHist.progress(itemId, Math.max(current, 1), pages.length);
+}
+
+/* ===== CLICK: left half = prev, right half = next ===== */
+reader.addEventListener("click", e => {
+  if (e.target.closest("#fsBtn")) return;
+  e.clientX > window.innerWidth / 2 ? next() : prev();
+});
+
+/* ===== SWIPE: works for both next and previous ===== */
+let startX = 0;
+let startY = 0;
+
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener("touchend", e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  const dy = e.changedTouches[0].clientY - startY;
+  /* Only trigger if horizontal swipe is dominant */
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 45) {
+    if (dx < 0) next(); /* swipe left = next */
+    else prev();        /* swipe right = prev */
+  }
+}, { passive: true });
+
+/* ===== KEYBOARD ===== */
+document.addEventListener("keydown", e => {
+  if (["ArrowRight", "ArrowDown", " "].includes(e.key)) { e.preventDefault(); next(); }
+  if (["ArrowLeft",  "ArrowUp"       ].includes(e.key)) { e.preventDefault(); prev(); }
+});
+
+/* ===== PINCH-TO-ZOOM on the book ===== */
+let baseScale  = 1;
+let curScale   = 1;
+let lastDist   = 0;
+let originX    = 0;
+let originY    = 0;
+
+book.addEventListener("touchstart", e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    lastDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    originX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+    originY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+  }
+}, { passive: false });
+
+book.addEventListener("touchmove", e => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    curScale = Math.min(Math.max(baseScale * (dist / lastDist), 1), 3);
+    book.style.transform = `scale(${curScale})`;
+    book.style.transformOrigin = `${originX}px ${originY}px`;
+  }
+}, { passive: false });
+
+book.addEventListener("touchend", e => {
+  if (e.touches.length < 2) {
+    baseScale = curScale;
+    /* Double-tap to reset zoom */
+  }
+}, { passive: true });
+
+/* Double-tap reset zoom */
+let lastTap = 0;
+book.addEventListener("touchend", e => {
+  if (e.touches.length > 0) return;
+  const now = Date.now();
+  if (now - lastTap < 300) {
+    curScale = 1; baseScale = 1;
+    book.style.transform = "scale(1)";
+  }
+  lastTap = now;
+}, { passive: true });
+
+/* ===== FULLSCREEN ===== */
+const fsBtn    = document.getElementById("fsBtn");
+const fsExpand = document.getElementById("fsExpand");
+const fsShrink = document.getElementById("fsShrink");
+
+fsBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  document.fullscreenElement
+    ? document.exitFullscreen().catch(() => {})
+    : document.documentElement.requestFullscreen().catch(() => {});
+});
+
+document.addEventListener("fullscreenchange", () => {
+  const fs = !!document.fullscreenElement;
+  fsExpand.style.display = fs ? "none"  : "block";
+  fsShrink.style.display = fs ? "block" : "none";
+});
+
+/* ===== PROTECTION ===== */
+document.oncontextmenu = e => e.preventDefault();
+document.addEventListener("dragstart",   e => e.preventDefault());
+document.addEventListener("copy",        e => e.preventDefault());
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && "spua".includes(e.key.toLowerCase())) e.preventDefault();
+  if (e.key === "F12" || e.key === "PrintScreen") e.preventDefault();
+});
+</script>
+
+</body>
+</html>

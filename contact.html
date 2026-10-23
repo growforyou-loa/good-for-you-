@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- ══ SEO ══ -->
+<title>Help Desk — Support, Account & Content Requests | Good for You</title>
+<meta name="description" content="Reach out to Good for You for support, feedback, account deletion, or content removal. Contact founder Gajanan Dhobale directly or submit a request — we're here to help.">
+<meta name="keywords" content="Good for You help desk, contact Gajanan Dhobale, support request, account deletion, content removal, Good for You contact, growforyou support">
+<meta name="author" content="Gajanan Dhobale">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://growforyou.in/contact.html">
+
+<!-- ══ Open Graph ══ -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Good for You">
+<meta property="og:url" content="https://growforyou.in/contact.html">
+<meta property="og:title" content="Help Desk — Support & Contact | Good for You">
+<meta property="og:description" content="Get support, submit content requests, or reach out to the founder of Good for You. We're here for you.">
+<meta property="og:image" content="https://growforyou.in/assets/images/home-og.jpg">
+<meta property="og:locale" content="en_US">
+
+<!-- ══ Twitter Card ══ -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Help Desk — Support & Contact | Good for You">
+<meta name="twitter:description" content="Get support, submit content requests, or reach out to the founder of Good for You.">
+<meta name="twitter:image" content="https://growforyou.in/assets/images/home-og.jpg">
+
+<!-- ══ PWA & Theme ══ -->
+<meta name="theme-color" content="#030712">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="/assets/images/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Good for You">
+
+<!-- ══ Schema.org JSON-LD ══ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "name": "Help Desk — Good for You",
+  "description": "Support, account management, content removal and direct contact for Good for You.",
+  "url": "https://growforyou.in/contact.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Good for You",
+    "url": "https://growforyou.in",
+    "logo": "https://growforyou.in/assets/images/icon-192.png",
+    "founder": {
+      "@type": "Person",
+      "name": "Gajanan Dhobale"
+    }
+  }
+}
+</script>
+
+<!-- ══ Fonts ══ -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════
+   ROOT & RESET
+════════════════════════════════ */
+:root {
+  --primary: #6366f1;
+  --secondary: #22d3ee;
+  --accent: #22c55e;
+  --pink: #f472b6;
+  --purple: #a78bfa;
+  --text: #e5e7eb;
+  --bg: #030712;
+}
+
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg); color: var(--text);
+  overflow-x: hidden; min-height: 100vh; position: relative;
+}
+
+/* ════════════════════════════════
+   ANIMATED BG ORBS
+════════════════════════════════ */
+.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.18;
+  animation: orbFloat ease-in-out infinite;
+}
+.bg-orb-1 { width:600px;height:600px;background:#6366f1;top:-10%;left:-10%;animation-duration:18s; }
+.bg-orb-2 { width:500px;height:500px;background:#22d3ee;top:30%;right:-10%;animation-duration:22s;animation-delay:-8s; }
+.bg-orb-3 { width:400px;height:400px;background:#a78bfa;bottom:10%;left:20%;animation-duration:15s;animation-delay:-4s; }
+@keyframes orbFloat {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33%      { transform:translate(40px,-30px) scale(1.05); }
+  66%      { transform:translate(-20px,40px) scale(0.95); }
+}
+
+/* ════════════════════════════════
+   KEYFRAME ANIMATIONS
+════════════════════════════════ */
+@keyframes titleFlow  { 0%{background-position:0% center;}100%{background-position:200% center;} }
+@keyframes fadeUp     { from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);} }
+@keyframes blink      { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+@keyframes scrollPulse{ 0%,100%{opacity:0.3;}50%{opacity:1;} }
+
+/* ════════════════════════════════
+   NAV
+════════════════════════════════ */
+.menu-btn {
+  position: fixed; top: 24px; left: 20px;
+  width: 52px; height: 52px; border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,15,30,0.85);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 5px;
+  cursor: grab; z-index: 4000; touch-action: none;
+  transition: border-color 0.3s;
+}
+.menu-btn:hover { border-color: rgba(34,211,238,0.4); }
+.menu-btn span { height:1.5px; width:22px; background:#e5e7eb; border-radius:2px; }
+
+
+/* ════════════════════════════════
+   HERO
+════════════════════════════════ */
+.hero {
+  min-height: 58vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 110px 20px 48px;
+  position: relative; z-index: 1;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: 999px;
+  border: 1px solid rgba(34,211,238,0.25);
+  background: rgba(34,211,238,0.07);
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--secondary); margin-bottom: 24px;
+  animation: fadeUp 0.6s ease both;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22d3ee; animation: blink 2s ease infinite;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.6rem, 10vw, 5rem); font-weight: 700;
+  background: linear-gradient(90deg,#ffffff,#a5f3fc,#86efac,#a78bfa,#22d3ee,#ffffff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: titleFlow 8s linear infinite, fadeUp 0.7s 0.1s ease both;
+  margin-bottom: 18px; line-height: 1.15;
+}
+
+.hero p {
+  font-size: 1.02rem; opacity: .65;
+  max-width: 520px; line-height: 1.7;
+  margin: 0 auto;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+
+.scroll-cue {
+  margin-top: 36px; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; opacity: 0.32;
+  animation: fadeUp 0.7s 0.5s ease both;
+}
+.scroll-cue span { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; }
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, #22d3ee, transparent);
+  animation: scrollPulse 2s ease infinite;
+}
+
+/* ════════════════════════════════
+   QUICK CONTACT PILLS
+════════════════════════════════ */
+.quick-contact {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+  max-width: 700px; margin: 0 auto 56px;
+  padding: 0 20px; position: relative; z-index: 1;
+  animation: fadeUp 0.7s 0.35s ease both;
+}
+.quick-pill {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 10px 20px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--text); text-decoration: none;
+  font-size: 0.83rem; font-weight: 500;
+  transition: 0.25s cubic-bezier(0.34,1.2,0.64,1);
+  backdrop-filter: blur(8px);
+}
+.quick-pill svg { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+.quick-pill:hover {
+  background: rgba(34,211,238,0.1);
+  border-color: rgba(34,211,238,0.35);
+  color: var(--secondary);
+  transform: translateY(-2px);
+}
+.quick-pill:hover svg { opacity: 1; }
+
+/* ════════════════════════════════
+   SECTIONS WRAPPER
+════════════════════════════════ */
+.sections-wrapper {
+  padding: 0 20px;
+  max-width: 900px;
+  margin: 0 auto 100px;
+  position: relative; z-index: 1;
+}
+
+/* ════════════════════════════════
+   CARDS
+════════════════════════════════ */
+.card {
+  background: rgba(15,23,42,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 28px;
+  padding: 40px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  margin-bottom: 32px;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+  position: relative; z-index: 1;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  opacity: 0; transform: translateY(28px);
+}
+.card.reveal { opacity: 1; transform: translateY(0); }
+.card:hover {
+  border-color: rgba(34,211,238,0.2);
+  box-shadow: 0 28px 60px rgba(0,0,0,0.4);
+}
+
+/* Card icon + heading row */
+.card-heading {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 12px;
+}
+.card-icon {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.25);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.card-icon svg { width: 20px; height: 20px; }
+
+.card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.45rem; font-weight: 700; color: #fff;
+}
+
+.card > p, .card-desc {
+  opacity: .65; margin-bottom: 28px;
+  font-size: 0.93rem; line-height: 1.7;
+  padding-left: 58px; /* aligns under icon */
+}
+
+/* ════════════════════════════════
+   FORM ELEMENTS
+════════════════════════════════ */
+.form-group { margin-bottom: 20px; }
+
+.form-group label {
+  display: block; font-size: 0.82rem; font-weight: 600;
+  color: var(--secondary); margin-bottom: 7px;
+  letter-spacing: 0.02em;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%; padding: 13px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: #fff; font-size: 0.92rem;
+  transition: border-color 0.3s, background 0.3s; outline: none;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--secondary);
+  background: rgba(255,255,255,0.08);
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: rgba(229,231,235,0.3); }
+
+.form-group textarea { min-height: 120px; resize: vertical; }
+
+/* Character counter */
+.char-counter {
+  text-align: right; font-size: 0.7rem;
+  opacity: 0.35; margin-top: 5px;
+  transition: color 0.2s;
+}
+.char-counter.warn { color: #f59e0b; opacity: 1; }
+.char-counter.over { color: #ef4444; opacity: 1; }
+
+/* Two-column input row */
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+@media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+
+.submit-btn {
+  width: 100%; padding: 15px; border: none;
+  border-radius: 999px; font-weight: 700; font-size: 0.95rem;
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  color: #fff; cursor: pointer;
+  box-shadow: 0 10px 24px rgba(99,102,241,0.25);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.submit-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(34,211,238,0.4); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Inline success state */
+.form-success {
+  display: none; text-align: center; padding: 32px 24px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 20px; margin-top: 6px;
+}
+.form-success.show { display: block; animation: fadeUp 0.4s ease; }
+.form-success h3 { color: #4ade80; margin-bottom: 8px; font-size: 1.1rem; }
+.form-success p { opacity: .65; font-size: .88rem; line-height: 1.6; }
+
+/* ════════════════════════════════
+   DIRECT CONTACT CARD
+════════════════════════════════ */
+.direct-contact-body {
+  padding-left: 58px;
+}
+.contact-detail {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px; border-radius: 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 14px;
+  transition: border-color 0.25s, background 0.25s;
+}
+.contact-detail:hover { border-color: rgba(34,211,238,0.3); background: rgba(34,211,238,0.05); }
+.contact-detail svg { width: 18px; height: 18px; opacity: 0.55; flex-shrink: 0; }
+.contact-detail-info { flex: 1; }
+.contact-detail-label { font-size: 0.7rem; opacity: 0.45; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+.contact-detail-value {
+  font-size: 0.9rem; font-weight: 600;
+  color: var(--secondary); text-decoration: none;
+  word-break: break-all;
+}
+.contact-detail-value:hover { text-decoration: underline; }
+
+.founder-note {
+  margin-top: 20px; padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(99,102,241,0.07);
+  border: 1px solid rgba(99,102,241,0.18);
+  font-size: 0.88rem; line-height: 1.65; opacity: 0.8;
+}
+.founder-note strong { color: #fff; opacity: 1; }
+
+/* ════════════════════════════════
+   FOOTER
+════════════════════════════════ */
+.site-footer {
+  background: rgba(8,12,24,0.8); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 56px 20px 30px; position: relative; z-index: 10;
+}
+.footer-content {
+  max-width: 920px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 40px;
+}
+.footer-brand h3 {
+  font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 10px;
+  background: linear-gradient(90deg,#fff,#22d3ee);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.footer-brand p { font-size: 0.85rem; opacity: 0.5; line-height: 1.6; margin-bottom: 18px; }
+.footer-socials { display: flex; gap: 10px; }
+.social-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; text-decoration: none; transition: 0.3s;
+}
+.social-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.social-icon:hover { background: var(--secondary); color: #000; transform: translateY(-4px); box-shadow: 0 8px 20px rgba(34,211,238,0.3); border-color: transparent; }
+.footer-links h4 { font-size: 0.88rem; font-weight: 600; color: #fff; margin-bottom: 16px; }
+.footer-links ul { list-style: none; }
+.footer-links li { margin-bottom: 10px; }
+.footer-links a { text-decoration: none; color: var(--text); opacity: 0.5; font-size: 0.85rem; transition: 0.3s; }
+.footer-links a:hover { opacity: 1; color: var(--secondary); padding-left: 4px; }
+.footer-bottom {
+  max-width: 920px; margin: 44px auto 0; padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.05); text-align: center;
+}
+.copyright { font-size: 0.75rem; opacity: 0.3; letter-spacing: 0.4px; }
+
+/* ════════════════════════════════
+   BACK TO TOP
+════════════════════════════════ */
+#backTop {
+  position: fixed; bottom: 100px; left: 20px;
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 1000;
+  opacity: 0; transform: translateY(10px);
+  transition: 0.3s; pointer-events: none; color: #fff;
+}
+#backTop.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+#backTop:hover { background:rgba(34,211,238,0.15); border-color:rgba(34,211,238,0.3); }
+#backTop svg { width:18px; height:18px; stroke:currentColor; }
+
+/* ════════════════════════════════
+   GAIA WIDGET
+════════════════════════════════ */
+#gfy-trigger {
+  position:fixed;bottom:28px;right:28px;width:58px;height:58px;border-radius:18px;
+  background:linear-gradient(135deg,#6366f1,#22d3ee);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 32px rgba(99,102,241,0.45);
+  transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),box-shadow 0.3s ease;z-index:9000;
+}
+#gfy-trigger:hover{transform:scale(1.08);box-shadow:0 12px 40px rgba(34,211,238,0.5);}
+#gfy-trigger::before{content:'';position:absolute;width:100%;height:100%;border-radius:18px;background:linear-gradient(135deg,#6366f1,#22d3ee);opacity:0.35;animation:gfyPulse 2.5s ease-out infinite;}
+@keyframes gfyPulse{0%{transform:scale(1);opacity:0.35;}70%{transform:scale(1.6);opacity:0;}100%{transform:scale(1.6);opacity:0;}}
+#gfy-trigger .gfy-ico-chat{transition:transform 0.3s ease,opacity 0.3s ease;}
+#gfy-trigger .gfy-ico-close{position:absolute;transform:scale(0);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease;}
+#gfy-trigger.open .gfy-ico-chat{transform:scale(0);opacity:0;}
+#gfy-trigger.open .gfy-ico-close{transform:scale(1);opacity:1;}
+#gfy-trigger .gfy-tip{position:absolute;right:70px;background:rgba(10,15,30,0.95);border:1px solid rgba(255,255,255,0.1);color:#e5e7eb;font-size:0.74rem;padding:6px 12px;border-radius:10px;white-space:nowrap;pointer-events:none;opacity:0;transform:translateX(8px);transition:all 0.2s ease;}
+#gfy-trigger:hover .gfy-tip{opacity:1;transform:translateX(0);}
+#gfy-widget{position:fixed;bottom:100px;right:28px;width:360px;max-height:560px;background:rgba(10,15,30,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:24px;box-shadow:0 24px 64px rgba(0,0,0,0.55),0 0 0 1px rgba(99,102,241,0.15);display:flex;flex-direction:column;overflow:hidden;z-index:8999;transform:translateY(20px) scale(0.95);opacity:0;pointer-events:none;transition:all 0.35s cubic-bezier(.34,1.2,.64,1);transform-origin:bottom right;backdrop-filter:blur(20px);}
+#gfy-widget.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all;}
+.gfy-header{background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(34,211,238,0.1));border-bottom:1px solid rgba(255,255,255,0.08);padding:15px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.gfy-avatar{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#0b1120,#1e1b4b);border:1.5px solid rgba(99,102,241,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(99,102,241,0.4),inset 0 0 8px rgba(34,211,238,0.1);position:relative;overflow:hidden;}
+.gfy-avatar::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(34,211,238,0.1));border-radius:14px;}
+.gfy-name{font-size:0.95rem;font-weight:600;color:#fff;}
+.gfy-status{font-size:0.68rem;color:rgba(34,211,238,0.8);display:flex;align-items:center;gap:5px;margin-top:2px;}
+.gfy-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:gfyBlink 2s ease infinite;}
+@keyframes gfyBlink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.gfy-messages{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
+.gfy-messages::-webkit-scrollbar{width:3px;}
+.gfy-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+.gfy-msg{display:flex;gap:8px;align-items:flex-end;animation:gfyUp 0.3s ease;}
+.gfy-msg.gfy-user{flex-direction:row-reverse;}
+@keyframes gfyUp{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.gfy-bubble{max-width:82%;padding:10px 14px;border-radius:16px;font-size:0.83rem;line-height:1.55;font-weight:300;}
+.gfy-msg.gfy-bot .gfy-bubble{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#e5e7eb;border-bottom-left-radius:4px;}
+.gfy-msg.gfy-user .gfy-bubble{background:linear-gradient(135deg,#6366f1,#22d3ee);color:#fff;border-bottom-right-radius:4px;}
+.gfy-mini{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;}
+.gfy-typing{display:flex;gap:4px;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:16px;border-bottom-left-radius:4px;width:fit-content;}
+.gfy-tdot{width:6px;height:6px;border-radius:50%;background:#22d3ee;animation:gfyType 1.2s ease infinite;}
+.gfy-tdot:nth-child(2){animation-delay:0.2s;}.gfy-tdot:nth-child(3){animation-delay:0.4s;}
+@keyframes gfyType{0%,60%,100%{transform:translateY(0);opacity:0.3;}30%{transform:translateY(-5px);opacity:1;}}
+.gfy-suggestions{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px;}
+.gfy-sug-btn{background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:20px;padding:5px 12px;font-size:0.72rem;color:#a5b4fc;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;}
+.gfy-sug-btn:hover{background:rgba(99,102,241,0.25);color:#fff;}
+.gfy-input-area{padding:10px 14px 14px;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;}
+.gfy-input-row{display:flex;gap:8px;align-items:center;}
+#gfy-input{flex:1;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 14px;font-size:0.82rem;color:#e5e7eb;background:rgba(255,255,255,0.05);outline:none;transition:border-color 0.2s ease;font-weight:300;}
+#gfy-input:focus{border-color:rgba(34,211,238,0.5);background:rgba(255,255,255,0.07);}
+#gfy-input::placeholder{color:rgba(229,231,235,0.3);}
+#gfy-input:disabled{opacity:0.5;cursor:not-allowed;}
+#gfy-send{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#22d3ee);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;flex-shrink:0;}
+#gfy-send:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(34,211,238,0.4);}
+#gfy-send:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.gfy-reset{display:block;margin:6px auto 0;background:none;border:none;font-size:0.68rem;color:rgba(229,231,235,0.3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;transition:color 0.2s;}
+.gfy-reset:hover{color:rgba(34,211,238,0.6);}
+@media(max-width:400px){#gfy-widget{width:calc(100vw - 20px);right:10px;bottom:88px;}#gfy-trigger{right:14px;bottom:20px;}}
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media (max-width: 600px) {
+  .card { padding: 28px 22px; }
+  .card > p, .card-desc { padding-left: 0; }
+  .direct-contact-body { padding-left: 0; }
+  .hero { min-height: 50vh; padding-top: 90px; }
+}
+</style>
+<script src="/drawer.js" defer></script>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-canvas" aria-hidden="true">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<!-- Nav -->
+<button class="menu-btn" id="menuBtn" aria-label="Toggle navigation" aria-expanded="false">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- Hero -->
+<header class="hero" role="banner">
+  <div class="hero-badge"><span class="hero-badge-dot"></span> We're Here to Help</div>
+  <h1>Help Desk 🤝</h1>
+  <p>Support, content requests, and community assistance — reach out and we'll get back to you soon.</p>
+  <div class="scroll-cue" aria-hidden="true">
+    <span>Get Support</span>
+    <div class="scroll-line"></div>
+  </div>
+</header>
+
+<!-- Quick Contact Pills -->
+<div class="quick-contact" aria-label="Quick contact options">
+  <a href="mailto:gajanandhobale0@gmail.com" class="quick-pill">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    Email Directly
+  </a>
+  <a href="https://www.instagram.com/justgajanan" target="_blank" rel="noopener noreferrer" class="quick-pill">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    Instagram DM
+  </a>
+  <a href="https://youtube.com/@goodforr_you" target="_blank" rel="noopener noreferrer" class="quick-pill">
+    <svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+    YouTube
+  </a>
+</div>
+
+<!-- ══ FORMS ══ -->
+<div class="sections-wrapper">
+
+  <!-- 1. General Contact -->
+  <div class="card reveal-card" role="region" aria-labelledby="contact-heading">
+    <div class="card-heading">
+      <div class="card-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h2 id="contact-heading">Contact Us</h2>
+    </div>
+    <p class="card-desc">General questions, feedback, or support regarding our platform.</p>
+
+    <form id="contactForm" name="contact-support" method="POST" data-netlify="true" action="/thank-you.html" novalidate>
+      <input type="hidden" name="form-name" value="contact-support">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="contact-name">Your Name</label>
+          <input type="text" id="contact-name" name="name" placeholder="e.g. Ananya Sharma" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Your Email</label>
+          <input type="email" id="contact-email" name="email" placeholder="you@example.com" required autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" name="reason" placeholder="Describe your question or feedback in detail…" required maxlength="1000"></textarea>
+        <div class="char-counter" id="contact-counter">0 / 1000</div>
+      </div>
+      <button type="submit" class="submit-btn" id="contactSubmitBtn">
+        <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+        Send Message
+      </button>
+    </form>
+    <div class="form-success" id="contactSuccess">
+      <h3>✅ Message Sent!</h3>
+      <p>Thanks for reaching out. Gajanan will get back to you as soon as possible. 💛</p>
+    </div>
+  </div>
+
+  <!-- 2. Account Management -->
+  <div class="card reveal-card" role="region" aria-labelledby="account-heading">
+    <div class="card-heading">
+      <div class="card-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="var(--pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M18 14l2 2-4 4"/></svg>
+      </div>
+      <h2 id="account-heading">Account Management</h2>
+    </div>
+    <p class="card-desc">Request permanent deletion of your account and all associated data.</p>
+
+    <form id="accountForm" name="account-deletion" method="POST" data-netlify="true" action="/thank-you.html" novalidate>
+      <input type="hidden" name="form-name" value="account-deletion">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="account-name">Your Name</label>
+          <input type="text" id="account-name" name="name" placeholder="Full name on account" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="account-email">Account Email</label>
+          <input type="email" id="account-email" name="email" placeholder="Account email address" required autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="account-reason">Reason for Deletion</label>
+        <textarea id="account-reason" name="reason" placeholder="Please briefly explain why you'd like your account removed…" required maxlength="600"></textarea>
+        <div class="char-counter" id="account-counter">0 / 600</div>
+      </div>
+      <button type="submit" class="submit-btn" id="accountSubmitBtn">
+        <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Submit Deletion Request
+      </button>
+    </form>
+    <div class="form-success" id="accountSuccess">
+      <h3>✅ Deletion Request Received</h3>
+      <p>Your request has been noted. We'll process the deletion and confirm via email within 3–5 business days. 🔒</p>
+    </div>
+  </div>
+
+  <!-- 3. Content Removal -->
+  <div class="card reveal-card" role="region" aria-labelledby="removal-heading">
+    <div class="card-heading">
+      <div class="card-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="11" y2="11"/></svg>
+      </div>
+      <h2 id="removal-heading">Content Removal</h2>
+    </div>
+    <p class="card-desc">Request removal of previously uploaded poems, stories or creative works from the platform.</p>
+
+    <form id="removalForm" name="content-removal" method="POST" data-netlify="true" action="/thank-you.html" novalidate>
+      <input type="hidden" name="form-name" value="content-removal">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="removal-name">Your Name</label>
+          <input type="text" id="removal-name" name="name" placeholder="Author / pen name" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label for="removal-email">Your Email</label>
+          <input type="email" id="removal-email" name="email" placeholder="Email used to submit" required autocomplete="email">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="removal-desc">Content to Remove</label>
+        <textarea id="removal-desc" name="reason" placeholder="Describe the content you'd like removed — title, type, and the reason for the request…" required maxlength="800"></textarea>
+        <div class="char-counter" id="removal-counter">0 / 800</div>
+      </div>
+      <button type="submit" class="submit-btn" id="removalSubmitBtn">
+        <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        Submit Removal Request
+      </button>
+    </form>
+    <div class="form-success" id="removalSuccess">
+      <h3>✅ Removal Request Received</h3>
+      <p>We'll review and remove the content within 5 business days and notify you by email. 📋</p>
+    </div>
+  </div>
+
+  <!-- 4. Direct Contact -->
+  <div class="card reveal-card" role="region" aria-labelledby="direct-heading">
+    <div class="card-heading">
+      <div class="card-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <h2 id="direct-heading">Direct Contact</h2>
+    </div>
+    <p class="card-desc">Reach out directly to the founder for collaborations, high-level feedback, or anything personal.</p>
+
+    <div class="direct-contact-body">
+      <div class="contact-detail">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="contact-detail-info">
+          <div class="contact-detail-label">Email</div>
+          <a href="mailto:gajanandhobale0@gmail.com" class="contact-detail-value">gajanandhobale0@gmail.com</a>
+        </div>
+      </div>
+
+      <div class="contact-detail">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        <div class="contact-detail-info">
+          <div class="contact-detail-label">Instagram</div>
+          <a href="https://www.instagram.com/just_cagajanan" target="_blank" rel="noopener noreferrer" class="contact-detail-value">@just_cagajanan</a>
+        </div>
+      </div>
+
+      <div class="contact-detail">
+        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        <div class="contact-detail-info">
+          <div class="contact-detail-label">YouTube</div>
+          <a href="https://youtube.com/@goodforr_you" target="_blank" rel="noopener noreferrer" class="contact-detail-value">@goodforr_you</a>
+        </div>
+      </div>
+
+      <div class="founder-note">
+        <strong>— Gajanan Dhobale</strong>, Author &amp; Founder of Good for You<br>
+        <span style="opacity:0.7">I read every message personally. Don't hesitate to reach out — whether it's feedback, a collaboration idea, or just to say hello. 💛</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end sections-wrapper -->
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <h3>Good for You</h3>
+      <p>A dedicated space for human emotions and words of feelings — by Gajanan Dhobale.</p>
+      <div class="footer-socials">
+        <a href="https://youtube.com/@goodforr_you" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Good for You on YouTube">
+          <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/gajanan_7501" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Gajanan Dhobale on Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.848 0-3.204.013-3.584.07-4.849.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        </a>
+        <a href="mailto:gajanandhobale75@gmail.com" class="social-icon" aria-label="Email Gajanan Dhobale">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/ebooks.html">Ebooks &amp; Poems</a></li>
+        <li><a href="/subliminals.html">Subliminal Library</a></li>
+        <li><a href="/account.html">My Account</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="/contact.html">Help Desk</a></li>
+        <li><a href="/privacy.html">Privacy Policy</a></li>
+        <li><a href="/terms.html">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="copyright">&copy; 2026 Good for You. Created with &#x1F49B; by Gajanan Dhobale.</p>
+  </div>
+</footer>
+
+<!-- Back to Top -->
+<button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+</button>
+
+<!-- Gaia Widget -->
+<button id="gfy-trigger" onclick="gfyToggle()" aria-label="Chat with Gaia AI assistant">
+  <span class="gfy-tip">Ask me anything</span>
+  <svg class="gfy-ico-chat" width="22" height="22" fill="none" viewBox="0 0 24 24">
+    <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="white"/>
+  </svg>
+  <svg class="gfy-ico-close" width="18" height="18" fill="none" viewBox="0 0 24 24">
+    <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="gfy-widget" role="dialog" aria-label="Gaia AI Chat">
+  <div class="gfy-header">
+    <div class="gfy-avatar">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="7" stroke="url(#ga1)" stroke-width="1.5" fill="none"/>
+        <path d="M15.5 12H12v2.5" stroke="url(#ga2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18.5" cy="5" r="1" fill="#22d3ee" opacity="0.9"/>
+        <circle cx="5.5" cy="18.5" r="0.7" fill="#a78bfa" opacity="0.8"/>
+        <circle cx="19.5" cy="17" r="0.5" fill="#22c55e" opacity="0.7"/>
+        <defs>
+          <linearGradient id="ga1" x1="5" y1="5" x2="19" y2="19"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient>
+          <linearGradient id="ga2" x1="12" y1="12" x2="16" y2="15"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#22c55e"/></linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div>
+      <div class="gfy-name">Gaia</div>
+      <div class="gfy-status"><span class="gfy-dot"></span> Your Good for You guide</div>
+    </div>
+  </div>
+  <div class="gfy-messages" id="gfy-messages">
+    <div class="gfy-msg gfy-bot">
+      <div class="gfy-mini">✦</div>
+      <div class="gfy-bubble">Hi, I'm <strong>Gaia</strong> — your personal guide to <em>Good for You</em>. Need help with support, your account, or just have a question? I'm here. ✨</div>
+    </div>
+  </div>
+  <!-- Contextual suggestions for Help Desk page -->
+  <div class="gfy-suggestions" id="gfy-suggestions">
+    <button class="gfy-sug-btn" onclick="gfyQuick('How do I contact support?')">How to contact support?</button>
+    <button class="gfy-sug-btn" onclick="gfyQuick('How do I delete my account?')">Delete my account</button>
+    <button class="gfy-sug-btn" onclick="gfyQuick('How do I remove my uploaded content?')">Remove my content</button>
+    <button class="gfy-sug-btn" onclick="gfyQuick('Tell me about Gajanan Dhobale')">About Gajanan Dhobale</button>
+  </div>
+  <div class="gfy-input-area">
+    <div class="gfy-input-row">
+      <input type="text" id="gfy-input" placeholder="Ask me anything…"/>
+      <button id="gfy-send" onclick="gfySend()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <button class="gfy-reset" onclick="gfyReset()">↺ New conversation</button>
+  </div>
+</div>
+
+<script>
+/* ─── Floating menu (draggable; opens /drawer.js menu) ─── */
+(() => {
+  const b = document.getElementById('menuBtn'); let down = false, moved = 0, ox = 0, oy = 0, sx = 0, sy = 0;
+  b.addEventListener('pointerdown', e => { down = true; moved = 0; sx = e.clientX; sy = e.clientY; ox = e.clientX - b.offsetLeft; oy = e.clientY - b.offsetTop; b.setPointerCapture(e.pointerId); b.style.cursor = 'grabbing' });
+  b.addEventListener('pointermove', e => { if (!down) return; moved = Math.max(moved, Math.hypot(e.clientX - sx, e.clientY - sy)); if (moved < 6) return;
+    b.style.left = Math.max(10, Math.min(innerWidth - 65, e.clientX - ox)) + 'px'; b.style.top = Math.max(10, Math.min(innerHeight - 65, e.clientY - oy)) + 'px';
+    const m = document.getElementById('gfyDrawer'); if (m) { m.style.left = b.style.left; m.style.top = (parseFloat(b.style.top) + 60) + 'px' } });
+  b.addEventListener('pointerup', () => { down = false; b.style.cursor = 'grab'; if (moved < 6 && window.openDrawer) window.openDrawer(b) });
+})();
+
+/* ═══════════════════════════════
+   BACK TO TOP
+═══════════════════════════════ */
+const backTop = document.getElementById('backTop');
+window.addEventListener('scroll', () => backTop.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* ═══════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════ */
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('reveal'), i * 100);
+      revealObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal-card').forEach(el => revealObs.observe(el));
+
+/* ═══════════════════════════════
+   CHARACTER COUNTERS
+═══════════════════════════════ */
+function setupCounter(textareaId, counterId, max) {
+  const ta = document.getElementById(textareaId);
+  const ct = document.getElementById(counterId);
+  if (!ta || !ct) return;
+  ta.addEventListener('input', () => {
+    const len = ta.value.length;
+    ct.textContent = len + ' / ' + max;
+    ct.classList.toggle('warn', len > max * 0.85 && len <= max);
+    ct.classList.toggle('over', len > max);
+  });
+}
+setupCounter('contact-message', 'contact-counter', 1000);
+setupCounter('account-reason',  'account-counter',  600);
+setupCounter('removal-desc',    'removal-counter',  800);
+
+/* ═══════════════════════════════
+   FORM SUBMISSIONS (inline success)
+═══════════════════════════════ */
+function setupForm(formId, successId, submitBtnId) {
+  const form = document.getElementById(formId);
+  const success = document.getElementById(successId);
+  const btn = document.getElementById(submitBtnId);
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.innerHTML = `<svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sending…`;
+
+    const formData = new FormData(this);
+    fetch('/', { method: 'POST', body: formData })
+      .then(() => {
+        form.style.display = 'none';
+        success.classList.add('show');
+      })
+      .catch(() => {
+        // Fallback: show success anyway (Netlify may handle navigation)
+        form.style.display = 'none';
+        success.classList.add('show');
+      });
+  });
+}
+
+setupForm('contactForm',  'contactSuccess',  'contactSubmitBtn');
+setupForm('accountForm',  'accountSuccess',  'accountSubmitBtn');
+setupForm('removalForm',  'removalSuccess',  'removalSubmitBtn');
+
+/* ═══════════════════════════════
+   SERVICE WORKER
+═══════════════════════════════ */
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+
+/* ═══════════════════════════════
+   GAIA WIDGET
+═══════════════════════════════ */
+const GFY_BACKEND = "https://my-ai-bot-2-r6q6.onrender.com";
+let gfyHistory = [], gfyBusy = false;
+
+function gfyToggle() {
+  document.getElementById('gfy-widget').classList.toggle('open');
+  document.getElementById('gfy-trigger').classList.toggle('open');
+}
+function gfyQuick(text) {
+  document.getElementById('gfy-input').value = text;
+  document.getElementById('gfy-suggestions').style.display = 'none';
+  gfySend();
+}
+async function gfySend() {
+  if (gfyBusy) return;
+  const input = document.getElementById('gfy-input');
+  const text = input.value.trim(); if (!text) return;
+  gfyAddMsg(text, 'gfy-user'); input.value = ''; gfySetBusy(true);
+  gfyHistory.push({ role: "user", content: text }); gfyShowTyping();
+  try {
+    const res = await fetch(`${GFY_BACKEND}/chat`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: gfyHistory })
+    });
+    const data = await res.json(); gfyRemoveTyping();
+    if (data.reply) { gfyAddMsg(data.reply, 'gfy-bot'); gfyHistory.push({ role: "assistant", content: data.reply }); }
+    else gfyAddMsg("Something went wrong. Please try again or email us directly.", 'gfy-bot');
+  } catch(err) {
+    gfyRemoveTyping();
+    gfyAddMsg("I'm having trouble connecting. Please email gajanandhobale75@gmail.com for help.", 'gfy-bot');
+  }
+  gfySetBusy(false);
+}
+function gfySetBusy(b) {
+  gfyBusy = b;
+  document.getElementById('gfy-input').disabled = b;
+  document.getElementById('gfy-send').disabled = b;
+}
+function gfyAddMsg(text, cls) {
+  const msgs = document.getElementById('gfy-messages');
+  const div = document.createElement('div'); div.className = `gfy-msg ${cls}`;
+  div.innerHTML = cls === 'gfy-bot' ? `<div class="gfy-mini">✦</div><div class="gfy-bubble">${text}</div>` : `<div class="gfy-bubble">${text}</div>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+function gfyShowTyping() {
+  const msgs = document.getElementById('gfy-messages');
+  const div = document.createElement('div'); div.className = 'gfy-msg gfy-bot'; div.id = 'gfy-typing';
+  div.innerHTML = `<div class="gfy-mini">✦</div><div class="gfy-typing"><div class="gfy-tdot"></div><div class="gfy-tdot"></div><div class="gfy-tdot"></div></div>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+function gfyRemoveTyping() { const el = document.getElementById('gfy-typing'); if(el) el.remove(); }
+function gfyReset() {
+  gfyHistory = [];
+  document.getElementById('gfy-messages').innerHTML = `<div class="gfy-msg gfy-bot"><div class="gfy-mini">✦</div><div class="gfy-bubble">Fresh start! I'm <strong>Gaia</strong>, back and ready. What can I help you with? ✨</div></div>`;
+  document.getElementById('gfy-suggestions').style.display = 'flex';
+}
+document.getElementById('gfy-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); gfySend(); }
+});
+</script>
+
+</body>
+</html>

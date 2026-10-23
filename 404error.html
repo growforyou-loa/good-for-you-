@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>404 — Page Not Found | Good for You</title>
+<meta name="description" content="The page you are looking for could not be found.">
+<meta name="author" content="Gajanan Dhobale">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://growforyou.in/404">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Good for You">
+<meta property="og:url" content="https://growforyou.in/404">
+<meta property="og:title" content="404 — Page Not Found | Good for You">
+<meta property="og:description" content="The page you are looking for could not be found.">
+<meta property="og:image" content="https://growforyou.in/assets/images/home-og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b1120">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="/assets/images/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Good for You">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --primary: #6366f1;
+  --secondary: #22d3ee;
+  --accent: #22c55e;
+  --pink: #f472b6;
+  --purple: #a78bfa;
+  --text: #e5e7eb;
+  --bg: #030712;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ── Animated Background ── */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+  animation: orbFloat ease-in-out infinite;
+}
+.bg-orb-1 { width:600px; height:600px; background:#6366f1; top:-10%; left:-10%; animation-duration:18s; }
+.bg-orb-2 { width:500px; height:500px; background:#22d3ee; top:30%; right:-10%; animation-duration:22s; animation-delay:-8s; }
+.bg-orb-3 { width:400px; height:400px; background:#a78bfa; bottom:10%; left:20%; animation-duration:15s; animation-delay:-4s; }
+@keyframes orbFloat {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33%      { transform:translate(40px,-30px) scale(1.05); }
+  66%      { transform:translate(-20px,40px) scale(0.95); }
+}
+
+/* ── Nav ── */
+.menu-btn {
+  position: fixed;
+  top: 24px; left: 20px;
+  width: 52px; height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,15,30,0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex; flex-direction:column;
+  justify-content:center; align-items:center; gap:5px;
+  cursor: grab;
+  z-index: 2000;
+  transition: border-color 0.3s;
+}
+.menu-btn:hover { border-color: rgba(34,211,238,0.4); }
+.menu-btn span { height:1.5px; width:22px; background:#e5e7eb; border-radius:2px; }
+
+.mobile-menu {
+  position: fixed;
+  top: 84px; left: 20px;
+  width: 230px;
+  background: rgba(8,12,28,0.97);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex; flex-direction:column; gap:4px;
+  opacity: 0;
+  transform: translateY(-14px) scale(.97);
+  pointer-events: none;
+  transition: .25s cubic-bezier(0.1,0.7,0.1,1);
+  z-index: 1900;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.mobile-menu.open { opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+.menu-logo {
+  font-size:1rem; font-weight:700;
+  background: linear-gradient(90deg,#fff,#22d3ee);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  padding:0 10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin-bottom:6px;
+}
+.mobile-menu a {
+  color: rgba(255,255,255,0.55);
+  text-decoration:none; font-size:0.9rem;
+  padding:10px 12px; border-radius:12px;
+  transition:0.2s;
+}
+.mobile-menu a:hover { color:#fff; background:rgba(255,255,255,0.05); }
+.mobile-menu a.active { color:#22d3ee; background:rgba(34,211,238,0.08); }
+
+/* ── Shared Buttons ── */
+.btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 28px; border-radius:16px;
+  background: linear-gradient(135deg,var(--primary),var(--secondary));
+  color:#fff; text-decoration:none;
+  font-weight:700; font-size:0.92rem;
+  box-shadow:0 10px 28px rgba(99,102,241,0.3);
+  transition:all 0.3s cubic-bezier(.34,1.56,.64,1);
+  white-space:nowrap; cursor:pointer; border:none;
+}
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 16px 36px rgba(34,211,238,0.4); }
+
+.btn-secondary {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 28px; border-radius:16px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#fff; text-decoration:none;
+  font-weight:600; font-size:0.92rem;
+  transition:all 0.3s ease; white-space:nowrap; cursor:pointer;
+}
+.btn-secondary:hover { background:rgba(255,255,255,0.08); border-color:rgba(34,211,238,0.35); transform:translateY(-2px); }
+
+/* ── Section labels (shared) ── */
+.section-label {
+  font-size:0.7rem; font-weight:700;
+  letter-spacing:0.15em; text-transform:uppercase;
+  color:var(--secondary); opacity:0.7;
+  margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-label::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,rgba(34,211,238,0.3),transparent);
+}
+
+/* ── Footer ── */
+.site-footer {
+  background: rgba(8,12,24,0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 56px 20px 30px;
+  position: relative;
+  z-index: 10;
+}
+.footer-content {
+  max-width:920px; margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:40px;
+}
+.footer-brand h3 {
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem; margin-bottom:10px;
+  background:linear-gradient(90deg,#fff,#22d3ee);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.footer-brand p { font-size:0.85rem; opacity:0.5; line-height:1.6; margin-bottom:18px; }
+.footer-socials { display:flex; gap:10px; }
+.social-icon {
+  width:40px; height:40px; border-radius:12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; text-decoration:none; transition:0.3s;
+}
+.social-icon svg { width:18px; height:18px; fill:currentColor; }
+.social-icon:hover { background:var(--secondary); color:#000; transform:translateY(-4px); box-shadow:0 8px 20px rgba(34,211,238,0.3); border-color:transparent; }
+.footer-links h4 { font-size:0.88rem; font-weight:600; color:#fff; margin-bottom:16px; }
+.footer-links ul { list-style:none; }
+.footer-links li { margin-bottom:10px; }
+.footer-links a { text-decoration:none; color:var(--text); opacity:0.5; font-size:0.85rem; transition:0.3s; }
+.footer-links a:hover { opacity:1; color:var(--secondary); padding-left:4px; }
+.footer-bottom {
+  max-width:920px; margin:44px auto 0;
+  padding-top:24px;
+  border-top:1px solid rgba(255,255,255,0.05);
+  text-align:center;
+}
+.copyright { font-size:0.75rem; opacity:0.3; letter-spacing:0.4px; }
+
+/* ── Back to Top ── */
+#backTop {
+  position:fixed; bottom:100px; left:20px;
+  width:44px; height:44px; border-radius:14px;
+  background:rgba(15,23,42,0.9);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; z-index:1000;
+  opacity:0; transform:translateY(10px);
+  transition:0.3s; pointer-events:none; color:#fff;
+}
+#backTop.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+#backTop:hover { background:rgba(34,211,238,0.15); border-color:rgba(34,211,238,0.3); }
+#backTop svg { width:18px; height:18px; stroke:currentColor; }
+
+/* ── Reveal animation ── */
+.reveal-card {
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal-card.reveal { opacity:1; transform:translateY(0); }
+
+@keyframes titleFlow { 0%{background-position:0% center;} 100%{background-position:200% center;} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(22px);} to{opacity:1;transform:translateY(0);} }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.2;} }
+
+
+.err-wrapper { min-height:85vh; display:flex; align-items:center; justify-content:center; padding:80px 20px; position:relative; z-index:1; text-align:center; }
+.error-container { max-width:520px; width:100%; }
+.error-code { font-family:'Playfair Display',serif; font-size:clamp(5rem,20vw,10rem); font-weight:700; background:linear-gradient(135deg,#6366f1,#22d3ee,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1; margin-bottom:10px; animation:fadeUp 0.8s ease both; }
+.error-container h1 { font-family:'Playfair Display',serif; font-size:1.8rem; color:#fff; margin-bottom:16px; animation:fadeUp 0.8s ease 0.1s both; }
+.poem-snippet { font-family:'Playfair Display',serif; font-style:italic; font-size:0.98rem; opacity:0.55; line-height:1.8; margin-bottom:32px; max-width:380px; margin-left:auto; margin-right:auto; animation:fadeUp 0.8s ease 0.2s both; }
+.error-container a { display:inline-flex; align-items:center; gap:8px; padding:14px 30px; border-radius:16px; background:linear-gradient(135deg,var(--primary),var(--secondary)); color:#fff; text-decoration:none; font-weight:700; font-size:0.92rem; box-shadow:0 10px 28px rgba(99,102,241,0.3); transition:all 0.3s; animation:fadeUp 0.8s ease 0.3s both; }
+.error-container a:hover { transform:translateY(-3px); }
+
+</style>
+</head>
+<body>
+<div class="bg-canvas" aria-hidden="true">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+<button class="menu-btn" id="menuBtn"><span></span><span></span><span></span></button>
+<nav class="mobile-menu" id="mobileMenu">
+  <div class="menu-logo">Good for You</div>
+  <a href="/" class="active">Home</a>
+  <a href="/ebooks.html">Ebooks &amp; Poems</a>
+  <a href="/subliminals.html">Subliminals</a>
+  <a href="/contact.html">Help Desk</a>
+  <a href="/account.html">My Account</a>
+</nav>
+<div class="err-wrapper"><div class="error-container"><div class="error-container">
+        <div class="error-code">404</div>
+        <h1>Lost in the Stars?</h1>
+        <p class="poem-snippet">
+            "Even in a wrong turn, there is a verse to be found.<br>
+            But for now, let’s guide you back to solid ground."
+        </p>
+        <a href="/" class="btn-back">Return Home</a>
+    </div></div></div>
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <h3>Good for You</h3>
+      <p>A dedicated space for human emotions and words of feelings — by Gajanan Dhobale.</p>
+      <div class="footer-socials">
+        <a href="https://youtube.com/@goodforr_you" class="social-icon" target="_blank" rel="noopener" aria-label="YouTube">
+          <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/gajanan_7501" class="social-icon" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.848 0-3.204.013-3.584.07-4.849.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        </a>
+        <a href="/contact.html" class="social-icon" aria-label="Email">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/ebooks.html">Ebooks &amp; Poems</a></li>
+        <li><a href="/subliminals.html">Subliminal Library</a></li>
+        <li><a href="/account.html">My Account</a></li>
+      </ul>
+    </div>
+    <div class="footer-links">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="/contact.html">Help Desk</a></li>
+        <li><a href="/privacy.html">Privacy Policy</a></li>
+        <li><a href="/terms.html">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="copyright">&copy; 2026 Good for You. Created with &#x1F49B; by Gajanan Dhobale.</p>
+  </div>
+</footer>
+<button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+</button>
+<!-- 
+ ╔══════════════════════════════════════════════╗
+ ║ Good for You — AI Chat Widget ║
+ ║ Paste this into any page on growforyou.in ║
+ ║ Replaces the static FAQ bot ║
+ ╚══════════════════════════════════════════════╝
+
+ SETUP:
+ 1. Change BACKEND_URL below to your deployed Python server URL
+ 2. Paste everything between the 
+
+<!-- Trigger Button -->
+<button id="gfy-trigger" onclick="gfyToggle()" aria-label="Chat with our AI assistant">
+ <span class="gfy-tip">Ask me anything </span>
+ <svg class="gfy-ico-chat" width="22" height="22" fill="none" viewBox="0 0 24 24">
+ <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="white"/>
+ </svg>
+ <svg class="gfy-ico-close" width="18" height="18" fill="none" viewBox="0 0 24 24">
+ <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+ </svg>
+</button>
+
+<!-- Chat Widget -->
+<div id="gfy-widget">
+ <div class="gfy-header">
+ <div class="gfy-avatar">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <!-- Gaia: stylised G letter with sparkle -->
+ <circle cx="12" cy="12" r="7" stroke="url(#ga1)" stroke-width="1.5" fill="none"/>
+ <path d="M15.5 12H12v2.5" stroke="url(#ga2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+ <circle cx="18.5" cy="5" r="1" fill="#22d3ee" opacity="0.9"/>
+ <circle cx="5.5" cy="18.5" r="0.7" fill="#a78bfa" opacity="0.8"/>
+ <circle cx="19.5" cy="17" r="0.5" fill="#22c55e" opacity="0.7"/>
+ <defs>
+ <linearGradient id="ga1" x1="5" y1="5" x2="19" y2="19">
+ <stop offset="0%" stop-color="#6366f1"/>
+ <stop offset="100%" stop-color="#22d3ee"/>
+ </linearGradient>
+ <linearGradient id="ga2" x1="12" y1="12" x2="16" y2="15">
+ <stop offset="0%" stop-color="#22d3ee"/>
+ <stop offset="100%" stop-color="#22c55e"/>
+ </linearGradient>
+ </defs>
+ </svg>
+ </div>
+ <div>
+ <div class="gfy-name">Gaia</div>
+ <div class="gfy-status"><span class="gfy-dot"></span> Your Good for You guide</div>
+ </div>
+ </div>
+
+ <div class="gfy-messages" id="gfy-messages">
+ <div class="gfy-msg gfy-bot">
+ <div class="gfy-mini">✦</div>
+ <div class="gfy-bubble">Hi, I'm <strong>Gaia</strong> — your personal guide to <em>Good for You</em>. I can help you explore poems, subliminals, membership and everything this platform has to offer. What would you like to know? ✨</div>
+ </div>
+ </div>
+
+ <div class="gfy-suggestions" id="gfy-suggestions">
+ <button class="gfy-sug-btn" onclick="gfyQuick('What poems are available?')">What poems are available?</button>
+ <button class="gfy-sug-btn" onclick="gfyQuick('How do I become a member?')">How to become a member?</button>
+ <button class="gfy-sug-btn" onclick="gfyQuick('What are subliminals?')">What are subliminals?</button>
+ <button class="gfy-sug-btn" onclick="gfyQuick('Tell me about Gajanan Dhobale')">About Gajanan Dhobale</button>
+ </div>
+
+ <div class="gfy-input-area">
+ <div class="gfy-input-row">
+ <input type="text" id="gfy-input" placeholder="Ask me anything…" />
+ <button id="gfy-send" onclick="gfySend()">
+ <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+ <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+ </svg>
+ </button>
+ </div>
+ <button class="gfy-reset" onclick="gfyReset()">↺ New conversation</button>
+ </div>
+</div>
+
+<script>
+// ── CONFIG — change this to your server URL when deployed ──────
+const GFY_BACKEND = "https://my-ai-bot-2-r6q6.onrender.com";
+
+// ── Conversation history (sent to Claude each time) ───────────
+let gfyHistory = [];
+let gfyBusy = false;
+
+function gfyToggle() {
+ document.getElementById('gfy-widget').classList.toggle('open');
+ document.getElementById('gfy-trigger').classList.toggle('open');
+}
+
+function gfyQuick(text) {
+ document.getElementById('gfy-input').value = text;
+ // Hide suggestions after first use
+ document.getElementById('gfy-suggestions').style.display = 'none';
+ gfySend();
+}
+
+async function gfySend() {
+ if (gfyBusy) return;
+ const input = document.getElementById('gfy-input');
+ const text = input.value.trim();
+ if (!text) return;
+
+ // Add user message to UI
+ gfyAddMsg(text, 'gfy-user');
+ input.value = '';
+ gfySetBusy(true);
+
+ // Add to history
+ gfyHistory.push({ role: "user", content: text });
+
+ // Show typing
+ gfyShowTyping();
+
+ try {
+ const res = await fetch(`${GFY_BACKEND}/chat`, {
+ method: "POST",
+ headers: { "Content-Type": "application/json" },
+ body: JSON.stringify({ messages: gfyHistory })
+ });
+
+ const data = await res.json();
+ gfyRemoveTyping();
+
+ if (data.reply) {
+ gfyAddMsg(data.reply, 'gfy-bot');
+ gfyHistory.push({ role: "assistant", content: data.reply });
+ } else {
+ gfyAddMsg("Something went wrong Please try again or visit our Help Desk.", 'gfy-bot');
+ }
+ } catch (err) {
+ gfyRemoveTyping();
+ gfyAddMsg("I'm having trouble connecting right now Please visit growforyou.in/contact for help.", 'gfy-bot');
+ }
+
+ gfySetBusy(false);
+}
+
+function gfySetBusy(busy) {
+ gfyBusy = busy;
+ document.getElementById('gfy-input').disabled = busy;
+ document.getElementById('gfy-send').disabled = busy;
+}
+
+function gfyAddMsg(text, cls) {
+ const msgs = document.getElementById('gfy-messages');
+ const div = document.createElement('div');
+ div.className = `gfy-msg ${cls}`;
+ div.innerHTML = cls === 'gfy-bot'
+ ? `<div class="gfy-mini">✦</div><div class="gfy-bubble">${text}</div>`
+ : `<div class="gfy-bubble">${text}</div>`;
+ msgs.appendChild(div);
+ msgs.scrollTop = msgs.scrollHeight;
+}
+
+function gfyShowTyping() {
+ const msgs = document.getElementById('gfy-messages');
+ const div = document.createElement('div');
+ div.className = 'gfy-msg gfy-bot'; div.id = 'gfy-typing';
+ div.innerHTML = `<div class="gfy-mini">✦</div><div class="gfy-typing"><div class="gfy-tdot"></div><div class="gfy-tdot"></div><div class="gfy-tdot"></div></div>`;
+ msgs.appendChild(div);
+ msgs.scrollTop = msgs.scrollHeight;
+}
+
+function gfyRemoveTyping() {
+ const el = document.getElementById('gfy-typing');
+ if (el) el.remove();
+}
+
+function gfyReset() {
+ gfyHistory = [];
+ document.getElementById('gfy-messages').innerHTML = `
+ <div class="gfy-msg gfy-bot">
+ <div class="gfy-mini">✦</div>
+ <div class="gfy-bubble">Fresh start! I'm <strong>Gaia</strong>, back and ready. What can I help you explore? ✨</div>
+ </div>`;
+ document.getElementById('gfy-suggestions').style.display = 'flex';
+}
+
+document.getElementById('gfy-input').addEventListener('keydown', e => {
+ if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); gfySend(); }
+});
+</script>
+<script>
+
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+if(menuBtn){
+  menuBtn.addEventListener('click', (e) => { e.stopPropagation(); mobileMenu.classList.toggle('open'); });
+  document.addEventListener('click', (e) => { if(!menuBtn.contains(e.target) && !mobileMenu.contains(e.target)) mobileMenu.classList.remove('open'); });
+  let _drag=false,_ox=0,_oy=0;
+  menuBtn.addEventListener('pointerdown',(e)=>{ _drag=true; _ox=e.clientX-menuBtn.offsetLeft; _oy=e.clientY-menuBtn.offsetTop; menuBtn.style.cursor='grabbing'; });
+  window.addEventListener('pointermove',(e)=>{ if(!_drag)return; let x=Math.max(0,Math.min(window.innerWidth-56,e.clientX-_ox)); let y=Math.max(0,Math.min(window.innerHeight-56,e.clientY-_oy)); menuBtn.style.left=x+'px'; menuBtn.style.top=y+'px'; mobileMenu.style.left=x+'px'; mobileMenu.style.top=(y+62)+'px'; });
+  window.addEventListener('pointerup',()=>{ _drag=false; menuBtn.style.cursor='grab'; });
+}
+const _bt=document.getElementById('backTop');
+if(_bt) window.addEventListener('scroll',()=>_bt.classList.toggle('show',scrollY>400));
+const _obs=new IntersectionObserver((entries)=>{ entries.forEach((e,i)=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('reveal'),i*80); _obs.unobserve(e.target); } }); },{threshold:0.08});
+document.querySelectorAll('.reveal-card').forEach(el=>_obs.observe(el));
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ADMIN: add more emails to this list if you want more admins
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['gajanandhoble5@gmail.com'];
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if isAdmin() || (request.auth != null && request.auth.uid == uid
+        && !request.resource.data.keys().hasAny(['blocked', 'libraryAccess']));
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['blocked', 'libraryAccess']));
+      allow delete: if isAdmin();
+    }
+
+    match /content/{id} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── Shayari wall ──
+    match /shayari/{id} {
+      allow read: if resource.data.status == 'published' || isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'published'
+        && request.resource.data.likes == 0 && request.resource.data.dislikes == 0
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.image is string && request.resource.data.image.matches('https://res.cloudinary.com/a7z3drop/.*')
+        && (!exists(/databases/$(database)/documents/users/$(request.auth.uid))
+            || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('blocked', false) == false);
+      allow update: if isAdmin()
+        || (request.auth != null && resource.data.uid == request.auth.uid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+            && request.resource.data.status in ['published', 'hidden'])
+        || (request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'dislikes'])
+        && request.resource.data.likes - resource.data.likes >= -1 && request.resource.data.likes - resource.data.likes <= 1
+        && request.resource.data.dislikes - resource.data.dislikes >= -1 && request.resource.data.dislikes - resource.data.dislikes <= 1);
+      allow delete: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+    }
+
+    match /shayariVotes/{vid} {
+      allow read: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create, update: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && vid == request.auth.uid + '_' + request.resource.data.sid
+        && request.resource.data.v in [1, -1];
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+  }
+}

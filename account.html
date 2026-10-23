@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- ══ SEO (noindex — private authenticated page) ══ -->
+<title>My Account — Good for You</title>
+<meta name="description" content="Manage your Good for You account, personal library, private consultations, and members-only community.">
+<meta name="keywords" content="Good for You account, member dashboard, library, community, consultation, Gajanan Dhobale">
+<meta name="author" content="Gajanan Dhobale">
+<meta name="robots" content="noindex, nofollow">
+
+<!-- ══ Open Graph ══ -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Good for You">
+<meta property="og:url" content="https://growforyou.in/account.html">
+<meta property="og:title" content="My Account — Good for You">
+<meta property="og:description" content="Access your personal library, private consultations and members-only community on Good for You.">
+<meta property="og:image" content="https://growforyou.in/assets/images/home-og.jpg">
+<meta property="og:locale" content="en_US">
+
+<!-- ══ Twitter Card ══ -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="My Account — Good for You">
+<meta name="twitter:description" content="Access your personal library, private consultations and members-only community.">
+<meta name="twitter:image" content="https://growforyou.in/assets/images/home-og.jpg">
+
+<!-- ══ PWA & Theme ══ -->
+<meta name="theme-color" content="#030712">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="/assets/images/icon-192.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Good for You">
+
+<!-- ══ Schema ══ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "name": "My Account — Good for You",
+  "url": "https://growforyou.in/account.html",
+  "publisher": { "@type": "Organization", "name": "Good for You", "url": "https://growforyou.in" }
+}
+</script>
+
+<!-- ══ Fonts ══ -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+
+<!-- ══ Firebase Auth ══ -->
+<script type="module" src="/firebase-auth.js"></script>
+<script type="module">
+import { collection, query, where, getDocs, doc, updateDoc, deleteDoc }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const grid = document.getElementById('actGrid'), empty = document.getElementById('actEmpty');
+let items = [];
+const esc = t => String(t || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function render() {
+  empty.style.display = items.length ? 'none' : '';
+  grid.innerHTML = items.map(it => `<div class="act-card ${it.status === 'hidden' ? 'hid' : ''}"><img src="${esc(it.image)}" alt="" loading="lazy"><div><small>${it.status === 'hidden' ? '🙈 Hidden' : '👁 Visible'} · ${new Date(it.createdAt).toLocaleDateString()} · 👍 ${it.likes || 0}</small><div class="act-btns"><button data-a="toggle" data-id="${it.id}">${it.status === 'hidden' ? 'Show' : 'Hide'}</button><button class="del" data-a="del" data-id="${it.id}">Delete</button></div></div></div>`).join('');
+}
+window.loadActivities = async () => {
+  const me = window.gfyAuth?.auth?.currentUser;
+  if (!me || me.isAnonymous) return;
+  try {
+    const snap = await getDocs(query(collection(gfyAuth.db, 'shayari'), where('uid', '==', me.uid)));
+    items = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  } catch (e) { console.warn(e); items = []; }
+  render();
+};
+grid.addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const it = items.find(x => x.id === b.dataset.id); if (!it) return;
+  try {
+    if (b.dataset.a === 'del') {
+      if (!confirm('Delete this shayari permanently?')) return;
+      await deleteDoc(doc(gfyAuth.db, 'shayari', it.id));
+      items = items.filter(x => x !== it);
+    } else {
+      const next = it.status === 'hidden' ? 'published' : 'hidden';
+      await updateDoc(doc(gfyAuth.db, 'shayari', it.id), { status: next });
+      it.status = next;
+    }
+    render();
+  } catch (err) { alert('Action failed. Please try again.'); }
+});
+</script>
+<script type="module" src="/history.js"></script>
+
+<style>
+/* ════════════════════════════════
+   ROOT & RESET
+════════════════════════════════ */
+:root {
+  --primary: #6366f1;
+  --secondary: #22d3ee;
+  --accent: #22c55e;
+  --pink: #f472b6;
+  --purple: #a78bfa;
+  --text: #e5e7eb;
+  --bg: #030712;
+}
+
+html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg); color: var(--text);
+  overflow-x: hidden; min-height: 100vh;
+}
+
+/* ════════════════════════════════
+   ANIMATED BG ORBS
+════════════════════════════════ */
+.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.18;
+  animation: orbFloat ease-in-out infinite;
+}
+.bg-orb-1 { width:600px;height:600px;background:#6366f1;top:-10%;left:-10%;animation-duration:18s; }
+.bg-orb-2 { width:500px;height:500px;background:#22d3ee;top:30%;right:-10%;animation-duration:22s;animation-delay:-8s; }
+.bg-orb-3 { width:400px;height:400px;background:#a78bfa;bottom:10%;left:20%;animation-duration:15s;animation-delay:-4s; }
+@keyframes orbFloat {
+  0%,100% { transform:translate(0,0) scale(1); }
+  33%      { transform:translate(40px,-30px) scale(1.05); }
+  66%      { transform:translate(-20px,40px) scale(0.95); }
+}
+
+/* ════════════════════════════════
+   KEYFRAMES
+════════════════════════════════ */
+@keyframes titleFlow   { 0%{background-position:0% center;}100%{background-position:200% center;} }
+@keyframes fadeUp      { from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);} }
+@keyframes fadeIn      { from{opacity:0;}to{opacity:1;} }
+@keyframes blink       { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+@keyframes shimmer     { 0%{background-position:-400px 0;}100%{background-position:400px 0;} }
+@keyframes spin        { to{transform:rotate(360deg);} }
+@keyframes badgePulse  { 0%,100%{box-shadow:0 0 0 0 rgba(34,211,238,0.4);}50%{box-shadow:0 0 0 7px rgba(34,211,238,0);} }
+@keyframes avatarGlow  { 0%,100%{box-shadow:0 0 20px rgba(99,102,241,0.3);}50%{box-shadow:0 0 40px rgba(34,211,238,0.5);} }
+
+/* ════════════════════════════════
+   NAV
+════════════════════════════════ */
+.menu-btn {
+  position: fixed; top: 24px; left: 20px;
+  width: 52px; height: 52px; border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,15,30,0.85);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 5px;
+  cursor: grab; z-index: 4000; touch-action: none;
+  transition: border-color 0.3s;
+}
+.menu-btn:hover { border-color: rgba(34,211,238,0.4); }
+.menu-btn span { height:1.5px; width:22px; background:#e5e7eb; border-radius:2px; }
+
+
+/* ════════════════════════════════
+   PAGE LOADING SKELETON
+════════════════════════════════ */
+#pageLoader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 18px;
+  transition: opacity 0.5s ease;
+}
+#pageLoader.hide { opacity: 0; pointer-events: none; }
+.loader-spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid rgba(34,211,238,0.15);
+  border-top-color: #22d3ee;
+  animation: spin 0.9s linear infinite;
+}
+.loader-text { font-size: 0.78rem; opacity: 0.4; letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ════════════════════════════════
+   LOGIN GATE
+════════════════════════════════ */
+#loginRequired {
+  min-height: 100vh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative; z-index: 1;
+  text-align: center;
+}
+
+/* Hero section of login gate */
+.login-hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: 999px;
+  border: 1px solid rgba(34,211,238,0.25);
+  background: rgba(34,211,238,0.07);
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--secondary); margin-bottom: 24px;
+  animation: fadeUp 0.6s ease both;
+}
+.login-hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #22d3ee; animation: blink 2s ease infinite;
+}
+
+.login-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 8vw, 4.2rem); font-weight: 700;
+  background: linear-gradient(90deg,#ffffff,#a5f3fc,#86efac,#a78bfa,#22d3ee,#ffffff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: titleFlow 8s linear infinite, fadeUp 0.7s 0.1s ease both;
+  margin-bottom: 16px; line-height: 1.15;
+}
+
+.login-hero-sub {
+  font-size: 1rem; opacity: .6; max-width: 480px;
+  line-height: 1.7; margin: 0 auto 48px;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+
+/* Benefits grid */
+.benefits-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; max-width: 700px; width: 100%; margin-bottom: 48px;
+  animation: fadeUp 0.7s 0.3s ease both;
+}
+.benefit-card {
+  background: rgba(15,23,42,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px; padding: 22px 20px;
+  text-align: left;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.3s, transform 0.3s;
+}
+.benefit-card:hover { border-color: rgba(34,211,238,0.25); transform: translateY(-4px); }
+.benefit-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px; font-size: 1.1rem;
+}
+.benefit-card h4 { font-size: 0.92rem; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.benefit-card p  { font-size: 0.78rem; opacity: 0.55; line-height: 1.5; }
+
+/* Login CTA buttons */
+.login-cta-group {
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+  width: 100%; max-width: 360px;
+  animation: fadeUp 0.7s 0.4s ease both;
+}
+.btn-join {
+  width: 100%; padding: 16px; border-radius: 999px; border: none;
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer;
+  box-shadow: 0 10px 28px rgba(99,102,241,0.3);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.btn-join:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(34,211,238,0.45); }
+
+.btn-login {
+  background: none; border: 1px solid rgba(255,255,255,0.15);
+  width: 100%; padding: 14px; border-radius: 999px;
+  color: rgba(255,255,255,0.7); font-size: 0.93rem; font-weight: 500;
+  cursor: pointer; transition: 0.25s;
+}
+.btn-login:hover { border-color: rgba(34,211,238,0.4); color: #fff; background: rgba(34,211,238,0.06); }
+
+.login-browse {
+  margin-top: 10px; font-size: 0.8rem; opacity: 0.4;
+}
+.login-browse a { color: var(--secondary); text-decoration: none; }
+.login-browse a:hover { text-decoration: underline; }
+
+/* New signup confirmation message */
+.signup-confirm {
+  display: none; margin-top: 20px; padding: 18px 24px;
+  background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 16px; max-width: 360px; text-align: center;
+}
+.signup-confirm.show { display: block; animation: fadeUp 0.4s ease; }
+.signup-confirm h4 { color: #4ade80; margin-bottom: 6px; font-size: 0.95rem; }
+.signup-confirm p { font-size: 0.82rem; opacity: 0.7; line-height: 1.55; }
+
+/* Identity error fallback */
+.identity-error {
+  display: none; margin-top: 20px; padding: 18px 24px;
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 16px; max-width: 360px; text-align: center;
+}
+.identity-error.show { display: block; }
+.identity-error p { font-size: 0.84rem; color: #f87171; line-height: 1.55; }
+.identity-error a { color: #fca5a5; }
+
+/* ════════════════════════════════
+   ACCOUNT AREA
+════════════════════════════════ */
+#accountArea { display: none; position: relative; z-index: 1; }
+
+.account-wrapper {
+  max-width: 900px; margin: 0 auto;
+  padding: 90px 20px 60px;
+}
+
+/* ── Profile Header ── */
+.account-header {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  margin-bottom: 48px;
+  animation: fadeUp 0.6s ease both;
+}
+
+.avatar-wrap {
+  position: relative; margin-bottom: 18px;
+}
+.avatar-ring {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 3px; animation: avatarGlow 4s ease infinite;
+}
+.avatar-inner {
+  width: 100%; height: 100%; border-radius: 50%;
+  background: rgba(15,23,42,0.9);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; font-size: 2.2rem; font-weight: 700;
+  color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.avatar-inner img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: none; /* shown only if gravatar loads */
+}
+.avatar-status {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--accent); border: 2.5px solid var(--bg);
+}
+
+.account-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem; font-weight: 700; color: #fff; margin-bottom: 6px;
+}
+.account-email { font-size: 0.83rem; opacity: 0.45; margin-bottom: 12px; }
+
+.member-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 6px 18px; border-radius: 999px;
+  background: rgba(34,211,238,0.09);
+  border: 1px solid rgba(34,211,238,0.28);
+  color: var(--secondary); font-size: 0.78rem; font-weight: 600;
+  animation: badgePulse 3s ease infinite;
+}
+.member-badge-dot { width:7px;height:7px;border-radius:50%;background:#22c55e; }
+
+.account-joined { font-size: 0.73rem; opacity: 0.35; margin-top: 8px; letter-spacing: 0.04em; }
+
+/* ── Action Cards ── */
+.account-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+  gap: 16px; margin-bottom: 32px;
+}
+
+.action-card {
+  padding: 26px 28px;
+  background: rgba(15,23,42,0.5);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 22px;
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition: border-color 0.25s, transform 0.3s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.3s;
+  display: flex; align-items: center; gap: 16px;
+  position: relative; overflow: hidden;
+  animation: fadeUp 0.6s ease both;
+}
+.action-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(99,102,241,0.05), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.action-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.35); }
+.action-card:hover::after { opacity: 1; }
+.action-card.active {
+  border-color: var(--secondary);
+  box-shadow: 0 0 0 1px rgba(34,211,238,0.2), 0 16px 40px rgba(0,0,0,0.35);
+}
+.action-card.active::after { opacity: 1; }
+
+.action-icon {
+  width: 48px; height: 48px; border-radius: 15px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+}
+.action-icon-library  { background: rgba(99,102,241,0.15); }
+.action-icon-community{ background: rgba(34,211,238,0.12); }
+.action-icon-consult  { background: rgba(34,197,94,0.12); }
+.action-icon-activity { background: rgba(244,114,182,0.14); }
+.act-card { border-radius:14px; overflow:hidden; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); }
+.act-card img { width:100%; display:block; background:rgba(255,255,255,0.05); }
+.act-card.hid img { opacity:.35; }
+.act-card div { padding:9px 11px 11px; }
+.act-card small { display:block; font-size:0.72rem; opacity:0.55; margin-bottom:8px; }
+.act-btns { display:flex; gap:8px; padding:0 !important; }
+.act-btns button { flex:1; background:none; border:1px solid rgba(255,255,255,0.15); color:inherit; border-radius:9px; padding:7px 0; font:inherit; font-size:0.78rem; cursor:pointer; }
+.act-btns .del { border-color:rgba(239,68,68,0.5); color:#f87171; }
+
+.action-card h3 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 3px; }
+.action-card p  { font-size: 0.78rem; opacity: 0.55; line-height: 1.4; }
+.action-chevron {
+  margin-left: auto; opacity: 0.3; flex-shrink: 0;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.action-card.active .action-chevron { transform: rotate(90deg); opacity: 0.8; }
+
+/* ── Section Panels ── */
+.section-panel {
+  display: none; margin-top: 4px; margin-bottom: 24px;
+  background: rgba(15,23,42,0.5);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 22px;
+  padding: 36px 32px; backdrop-filter: blur(12px);
+  animation: fadeUp 0.35s ease;
+}
+.section-panel.open { display: block; }
+.section-panel h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem; margin-bottom: 22px; color: #fff;
+  display: flex; align-items: center; gap: 10px;
+}
+
+/* Library placeholder cards */
+.library-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.library-placeholder {
+  height: 180px; border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 100%);
+  background-size: 400px 100%;
+  animation: shimmer 1.8s linear infinite;
+}
+.library-coming {
+  text-align: center; padding: 28px 16px;
+  background: rgba(99,102,241,0.06); border: 1px dashed rgba(99,102,241,0.2);
+  border-radius: 16px; margin-top: 12px;
+}
+.library-coming p { opacity: 0.55; font-size: 0.88rem; line-height: 1.65; }
+.library-coming a { color: var(--secondary); text-decoration: none; }
+.library-coming a:hover { text-decoration: underline; }
+.hist-card { display:block; text-decoration:none; color:inherit; border-radius:14px; overflow:hidden; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); transition:.2s; }
+.hist-card:hover { border-color:rgba(34,211,238,0.4); transform:translateY(-2px); }
+.hist-card img { width:100%; height:150px; object-fit:cover; display:block; background:rgba(255,255,255,0.05); }
+.hist-card div { padding:9px 11px 11px; }
+.hist-card b { display:block; font-size:0.82rem; font-weight:600; line-height:1.3; margin-bottom:4px; }
+.hist-card small { display:block; font-size:0.72rem; opacity:0.55; }
+.hist-clear { background:none; border:1px solid rgba(255,255,255,0.12); color:inherit; opacity:0.6; border-radius:10px; padding:8px 16px; font:inherit; font-size:0.8rem; cursor:pointer; margin-top:14px; }
+.hist-clear:hover { opacity:1; }
+
+/* Community / Disqus */
+.disqus-loading {
+  display: flex; align-items: center; gap: 12px;
+  padding: 20px; font-size: 0.85rem; opacity: 0.5;
+}
+.disqus-spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(34,211,238,0.2); border-top-color: #22d3ee;
+  animation: spin 0.8s linear infinite; flex-shrink: 0;
+}
+#disqus_thread { margin-top: 8px; }
+
+/* Consultation form */
+.consult-form .form-group { margin-bottom: 18px; }
+.consult-form label {
+  display: block; font-size: 0.82rem; font-weight: 600;
+  color: var(--secondary); margin-bottom: 7px; letter-spacing: 0.02em;
+}
+.consult-form input,
+.consult-form textarea {
+  width: 100%; padding: 13px 16px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05); color: #fff;
+  font-size: 0.92rem; outline: none; transition: border-color 0.3s, background 0.3s;
+}
+.consult-form input:focus,
+.consult-form textarea:focus { border-color: var(--secondary); background: rgba(255,255,255,0.08); }
+.consult-form input::placeholder,
+.consult-form textarea::placeholder { color: rgba(229,231,235,0.3); }
+.consult-form textarea { min-height: 120px; resize: vertical; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media(max-width:560px){ .form-row { grid-template-columns: 1fr; } }
+
+.btn-submit {
+  width: 100%; padding: 14px; border-radius: 999px; border: none;
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  color: #fff; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+  box-shadow: 0 10px 24px rgba(99,102,241,0.25);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+}
+.btn-submit:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(34,211,238,0.4); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.form-success {
+  display: none; padding: 24px; text-align: center;
+  background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 16px; margin-top: 6px;
+}
+.form-success.show { display: block; animation: fadeUp 0.4s ease; }
+.form-success h4 { color: #4ade80; margin-bottom: 6px; }
+.form-success p { opacity: .65; font-size: .85rem; }
+
+/* ── Logout ── */
+.logout-wrap { text-align: center; margin-top: 50px; padding-bottom: 20px; }
+.logout-btn {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+  padding: 12px 36px; border-radius: 999px;
+  color: #f87171; font-weight: 600; font-size: 0.9rem;
+  cursor: pointer; transition: 0.25s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.logout-btn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
+
+/* ════════════════════════════════
+   BACK TO TOP
+════════════════════════════════ */
+#backTop {
+  position: fixed; bottom: 100px; left: 20px;
+  width: 44px; height: 44px; border-radius: 14px;
+  background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 1000; color: #fff;
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: 0.3s;
+}
+#backTop.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+#backTop:hover { background:rgba(34,211,238,0.15); border-color:rgba(34,211,238,0.3); }
+#backTop svg { width:18px; height:18px; stroke:currentColor; }
+
+/* ════════════════════════════════
+   FOOTER
+════════════════════════════════ */
+.site-footer {
+  background: rgba(8,12,24,0.8); backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 56px 20px 30px; position: relative; z-index: 10;
+}
+.footer-content {
+  max-width: 920px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 40px;
+}
+.footer-brand h3 {
+  font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 10px;
+  background: linear-gradient(90deg,#fff,#22d3ee);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+.footer-brand p { font-size: 0.85rem; opacity: 0.5; line-height: 1.6; margin-bottom: 18px; }
+.footer-socials { display: flex; gap: 10px; }
+.social-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; text-decoration: none; transition: 0.3s;
+}
+.social-icon svg { width: 18px; height: 18px; fill: currentColor; }
+.social-icon:hover { background: var(--secondary); color: #000; transform: translateY(-4px); box-shadow: 0 8px 20px rgba(34,211,238,0.3); border-color: transparent; }
+.footer-links h4 { font-size: 0.88rem; font-weight: 600; color: #fff; margin-bottom: 16px; }
+.footer-links ul { list-style: none; }
+.footer-links li { margin-bottom: 10px; }
+.footer-links a { text-decoration: none; color: var(--text); opacity: 0.5; font-size: 0.85rem; transition: 0.3s; }
+.footer-links a:hover { opacity: 1; color: var(--secondary); padding-left: 4px; }
+.footer-bottom {
+  max-width: 920px; margin: 44px auto 0; padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.05); text-align: center;
+}
+.copyright { font-size: 0.75rem; opacity: 0.3; letter-spacing: 0.4px; }
+
+/* ════════════════════════════════
+   GAIA WIDGET
+════════════════════════════════ */
+#gfy-trigger {
+  position:fixed;bottom:28px;right:28px;width:58px;height:58px;border-radius:18px;
+  background:linear-gradient(135deg,#6366f1,#22d3ee);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 32px rgba(99,102,241,0.45);
+  transition:transform 0.3s cubic-bezier(.34,1.56,.64,1),box-shadow 0.3s ease;z-index:9000;
+}
+#gfy-trigger:hover{transform:scale(1.08);box-shadow:0 12px 40px rgba(34,211,238,0.5);}
+#gfy-trigger::before{content:'';position:absolute;width:100%;height:100%;border-radius:18px;background:linear-gradient(135deg,#6366f1,#22d3ee);opacity:0.35;animation:gfyPulse 2.5s ease-out infinite;}
+@keyframes gfyPulse{0%{transform:scale(1);opacity:0.35;}70%{transform:scale(1.6);opacity:0;}100%{transform:scale(1.6);opacity:0;}}
+#gfy-trigger .gfy-ico-chat{transition:transform 0.3s ease,opacity 0.3s ease;}
+#gfy-trigger .gfy-ico-close{position:absolute;transform:scale(0);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease;}
+#gfy-trigger.open .gfy-ico-chat{transform:scale(0);opacity:0;}
+#gfy-trigger.open .gfy-ico-close{transform:scale(1);opacity:1;}
+#gfy-trigger .gfy-tip{position:absolute;right:70px;background:rgba(10,15,30,0.95);border:1px solid rgba(255,255,255,0.1);color:#e5e7eb;font-size:0.74rem;padding:6px 12px;border-radius:10px;white-space:nowrap;pointer-events:none;opacity:0;transform:translateX(8px);transition:all 0.2s ease;}
+#gfy-trigger:hover .gfy-tip{opacity:1;transform:translateX(0);}
+#gfy-widget{position:fixed;bottom:100px;right:28px;width:360px;max-height:560px;background:rgba(10,15,30,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:24px;box-shadow:0 24px 64px rgba(0,0,0,0.55),0 0 0 1px rgba(99,102,241,0.15);display:flex;flex-direction:column;overflow:hidden;z-index:8999;transform:translateY(20px) scale(0.95);opacity:0;pointer-events:none;transition:all 0.35s cubic-bezier(.34,1.2,.64,1);transform-origin:bottom right;backdrop-filter:blur(20px);}
+#gfy-widget.open{transform:translateY(0) scale(1);opacity:1;pointer-events:all;}
+.gfy-header{background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(34,211,238,0.1));border-bottom:1px solid rgba(255,255,255,0.08);padding:15px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.gfy-avatar{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#0b1120,#1e1b4b);border:1.5px solid rgba(99,102,241,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(99,102,241,0.4),inset 0 0 8px rgba(34,211,238,0.1);position:relative;overflow:hidden;}
+.gfy-avatar::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(34,211,238,0.1));border-radius:14px;}
+.gfy-name{font-size:0.95rem;font-weight:600;color:#fff;}
+.gfy-status{font-size:0.68rem;color:rgba(34,211,238,0.8);display:flex;align-items:center;gap:5px;margin-top:2px;}
+.gfy-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:gfyBlink 2s ease infinite;}
+@keyframes gfyBlink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.gfy-messages{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;}
+.gfy-messages::-webkit-scrollbar{width:3px;}
+.gfy-messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+.gfy-msg{display:flex;gap:8px;align-items:flex-end;animation:gfyUp 0.3s ease;}
+.gfy-msg.gfy-user{flex-direction:row-reverse;}
+@keyframes gfyUp{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.gfy-bubble{max-width:82%;padding:10px 14px;border-radius:16px;font-size:0.83rem;line-height:1.55;font-weight:300;}
+.gfy-msg.gfy-bot .gfy-bubble{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);color:#e5e7eb;border-bottom-left-radius:4px;}
+.gfy-msg.gfy-user .gfy-bubble{background:linear-gradient(135deg,#6366f1,#22d3ee);color:#fff;border-bottom-right-radius:4px;}
+.gfy-mini{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#22d3ee);display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;}
+.gfy-typing{display:flex;gap:4px;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:16px;border-bottom-left-radius:4px;width:fit-content;}
+.gfy-tdot{width:6px;height:6px;border-radius:50%;background:#22d3ee;animation:gfyType 1.2s ease infinite;}
+.gfy-tdot:nth-child(2){animation-delay:0.2s;}.gfy-tdot:nth-child(3){animation-delay:0.4s;}
+@keyframes gfyType{0%,60%,100%{transform:translateY(0);opacity:0.3;}30%{transform:translateY(-5px);opacity:1;}}
+.gfy-suggestions{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px;}
+.gfy-sug-btn{background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:20px;padding:5px 12px;font-size:0.72rem;color:#a5b4fc;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;}
+.gfy-sug-btn:hover{background:rgba(99,102,241,0.25);color:#fff;}
+.gfy-input-area{padding:10px 14px 14px;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;}
+.gfy-input-row{display:flex;gap:8px;align-items:center;}
+#gfy-input{flex:1;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:10px 14px;font-size:0.82rem;color:#e5e7eb;background:rgba(255,255,255,0.05);outline:none;transition:border-color 0.2s ease;font-weight:300;}
+#gfy-input:focus{border-color:rgba(34,211,238,0.5);background:rgba(255,255,255,0.07);}
+#gfy-input::placeholder{color:rgba(229,231,235,0.3);}
+#gfy-input:disabled{opacity:0.5;cursor:not-allowed;}
+#gfy-send{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#22d3ee);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;flex-shrink:0;}
+#gfy-send:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(34,211,238,0.4);}
+#gfy-send:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.gfy-reset{display:block;margin:6px auto 0;background:none;border:none;font-size:0.68rem;color:rgba(229,231,235,0.3);cursor:pointer;text-decoration:underline;text-underline-offset:2px;transition:color 0.2s;}
+.gfy-reset:hover{color:rgba(34,211,238,0.6);}
+@media(max-width:400px){#gfy-widget{width:calc(100vw - 20px);right:10px;bottom:88px;}#gfy-trigger{right:14px;bottom:20px;}}
+
+/* ════════════════════════════════
+   RESPONSIVE
+════════════════════════════════ */
+@media(max-width:600px){
+  .section-panel { padding: 24px 18px; }
+  .benefits-grid { grid-template-columns: 1fr 1fr; }
+  .account-wrapper { padding-top: 80px; }
+}
+@media(max-width:380px){
+  .benefits-grid { grid-template-columns: 1fr; }
+}
+</style>
+<script src="/drawer.js" defer></script>
+</head>
+<body>
+
+<!-- Page loader (shown while Firebase Auth initialises) -->
+<div id="pageLoader" role="status" aria-label="Loading">
+  <div class="loader-spinner"></div>
+  <div class="loader-text">Loading your account…</div>
+</div>
+
+<!-- BG -->
+<div class="bg-canvas" aria-hidden="true">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<!-- Nav -->
+<button class="menu-btn" id="menuBtn" aria-label="Toggle navigation" aria-expanded="false">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- ══ LOGIN GATE ══ -->
+<section id="loginRequired" aria-label="Join or sign in">
+
+  <div class="login-hero-badge">
+    <span class="login-hero-badge-dot"></span> Members Only
+  </div>
+
+  <h1 class="login-hero-title">Welcome Back 👋</h1>
+  <p class="login-hero-sub">Sign in to unlock your personal library, private consultations, and the live members-only community.</p>
+
+  <!-- Benefits -->
+  <div class="benefits-grid" role="list">
+    <div class="benefit-card" role="listitem">
+      <div class="benefit-icon" style="background:rgba(99,102,241,0.15);">📚</div>
+      <h4>Personal Library</h4>
+      <p>Your saved ebooks, reading history and downloads in one place.</p>
+    </div>
+    <div class="benefit-card" role="listitem">
+      <div class="benefit-icon" style="background:rgba(34,211,238,0.12);">💬</div>
+      <h4>Live Community</h4>
+      <p>Join discussions with fellow conscious members.</p>
+    </div>
+    <div class="benefit-card" role="listitem">
+      <div class="benefit-icon" style="background:rgba(34,197,94,0.12);">🧠</div>
+      <h4>Private Consultation</h4>
+      <p>Submit personal guidance requests directly to Gajanan.</p>
+    </div>
+    <div class="benefit-card" role="listitem">
+      <div class="benefit-icon" style="background:rgba(167,139,250,0.12);">✨</div>
+      <h4>Free to Join</h4>
+      <p>Membership is completely free — just sign up with your email.</p>
+    </div>
+  </div>
+
+  <!-- CTAs -->
+  <div class="login-cta-group">
+    <button class="btn-join" id="joinBtn" onclick="location.href='/signup.html'">
+      <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Join Now — It's Free
+    </button>
+    <button class="btn-login" id="signinBtn" onclick="location.href='/login.html'">
+      Already a member? Sign in
+    </button>
+    <p class="login-browse">
+      Just browsing? <a href="/ebooks.html">Explore the library →</a>
+    </p>
+  </div>
+
+  <!-- Post-signup confirmation (shown after new sign-up) -->
+  <div class="signup-confirm" id="signupConfirm">
+    <h4>📬 Check your email!</h4>
+    <p>We sent you a confirmation link. Click it to activate your account and come back here to sign in.</p>
+  </div>
+
+  <!-- Identity error fallback (shown if widget fails to load) -->
+  <div class="identity-error" id="identityError">
+    <p>Having trouble loading sign-in? Please <a href="/contact.html">contact support</a> or try refreshing the page.</p>
+  </div>
+
+</section>
+
+<!-- ══ ACCOUNT AREA (logged-in) ══ -->
+<section id="accountArea" aria-label="Your account">
+  <div class="account-wrapper">
+
+    <!-- Profile Header -->
+    <div class="account-header">
+      <div class="avatar-wrap">
+        <div class="avatar-ring">
+          <div class="avatar-inner" id="avatarInner">
+            <img id="avatarImg" src="" alt="Profile photo">
+            <span id="avatarInitials"></span>
+          </div>
+        </div>
+        <div class="avatar-status" title="Online"></div>
+      </div>
+      <div class="account-name" id="userName">Member</div>
+      <div class="account-email" id="userEmail"></div>
+      <div class="member-badge">
+        <span class="member-badge-dot"></span> Verified Member
+      </div>
+      <div class="account-joined" id="joinedDate"></div>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="account-actions" role="tablist">
+      <div class="action-card" id="card-library" role="tab" aria-selected="false" tabindex="0"
+           onclick="togglePanel('libraryPanel', 'card-library')" onkeydown="if(event.key==='Enter'||event.key===' ')togglePanel('libraryPanel','card-library')">
+        <div class="action-icon action-icon-library">📚</div>
+        <div>
+          <h3>Your Library</h3>
+          <p>Saved ebooks &amp; reading history</p>
+        </div>
+        <svg class="action-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="action-card" id="card-activity" role="tab" aria-selected="false" tabindex="0"
+           onclick="togglePanel('activityPanel', 'card-activity')" onkeydown="if(event.key==='Enter'||event.key===' ')togglePanel('activityPanel','card-activity')">
+        <div class="action-icon action-icon-activity">🪶</div>
+        <div>
+          <h3>Your Activities</h3>
+          <p>Your Shayari posts</p>
+        </div>
+        <svg class="action-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="action-card" id="card-community" role="tab" aria-selected="false" tabindex="0"
+           onclick="togglePanel('communityPanel', 'card-community')" onkeydown="if(event.key==='Enter'||event.key===' ')togglePanel('communityPanel','card-community')">
+        <div class="action-icon action-icon-community">💬</div>
+        <div>
+          <h3>Live Community</h3>
+          <p>Members-only discussions</p>
+        </div>
+        <svg class="action-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
+      </div>
+
+      <div class="action-card" id="card-consult" role="tab" aria-selected="false" tabindex="0"
+           onclick="togglePanel('consultPanel', 'card-consult')" onkeydown="if(event.key==='Enter'||event.key===' ')togglePanel('consultPanel','card-consult')">
+        <div class="action-icon action-icon-consult">🧠</div>
+        <div>
+          <h3>Consultation</h3>
+          <p>Private guidance &amp; requests</p>
+        </div>
+        <svg class="action-chevron" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- Library Panel -->
+    <div id="libraryPanel" class="section-panel" role="tabpanel" aria-labelledby="card-library">
+      <h2>📚 Your Library</h2>
+      <div class="library-grid" id="histGrid"></div>
+      <div class="library-coming" id="histEmpty">
+        <p>Books, poems and shayari you open will show up here. Start with the <a href="/ebooks.html">eLibrary →</a> or the <a href="/shayari.html">Shayari wall →</a></p>
+      </div>
+      <div style="text-align:center"><button class="hist-clear" id="histClear" style="display:none">Clear history</button></div>
+    </div>
+
+    <!-- Activities Panel -->
+    <div id="activityPanel" class="section-panel" role="tabpanel" aria-labelledby="card-activity">
+      <h2>🪶 Your Activities</h2>
+      <div class="library-grid" id="actGrid"></div>
+      <div class="library-coming" id="actEmpty" style="display:none"><p>You haven't posted any Shayari while signed in. <a href="/shayari.html">Go to the Shayari wall →</a></p></div>
+    </div>
+
+    <!-- Community Panel -->
+    <div id="communityPanel" class="section-panel" role="tabpanel" aria-labelledby="card-community">
+      <h2>💬 Community Discussion</h2>
+      <p style="opacity:0.6;font-size:0.9rem;margin-bottom:20px;">Join the live conversation with other conscious members below.</p>
+      <div class="disqus-loading" id="disqusLoading">
+        <div class="disqus-spinner"></div>
+        Loading community chat…
+      </div>
+      <div id="disqus_thread"></div>
+    </div>
+
+    <!-- Consultation Panel -->
+    <div id="consultPanel" class="section-panel" role="tabpanel" aria-labelledby="card-consult">
+      <h2>🧠 Private Consultation</h2>
+      <p style="opacity:0.6;font-size:0.9rem;margin-bottom:26px;">Submit a personal guidance or custom content request directly to Gajanan.</p>
+
+      <form id="consultForm" class="consult-form" name="consult-form" method="POST" data-netlify="true" action="/thank-you.html" novalidate>
+        <input type="hidden" name="form-name" value="consult-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="consult-name">Your Name</label>
+            <input type="text" id="consult-name" name="name" placeholder="Your name" required autocomplete="name">
+          </div>
+          <div class="form-group">
+            <label for="consult-email">Your Email</label>
+            <input type="email" id="consult-email" name="email" placeholder="email@example.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="consult-message">Your Request</label>
+          <textarea id="consult-message" name="message" rows="4" placeholder="Describe your concern, question or custom request in detail…" required></textarea>
+        </div>
+        <button type="submit" class="btn-submit" id="consultSubmitBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+          Submit Request
+        </button>
+      </form>
+      <div class="form-success" id="consultSuccess">
+        <h4>✅ Request Submitted!</h4>
+        <p>Gajanan will review your message and reply via email. Thank you for reaching out. 💛</p>
+      </div>
+    </div>
+
+    <!-- Logout -->
+    <div class="logout-wrap">
+      <button id="logoutBtn" class="logout-btn">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign out
+      </button>
+    </div>
+
+  </div><!-- end account-wrapper -->
+
+  <!-- Footer inside account area -->
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Good for You</h3>
+        <p>A dedicated space for human emotions and words of feelings — by Gajanan Dhobale.</p>
+        <div class="footer-socials">
+          <a href="https://youtube.com/@goodforr_you" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Good for You on YouTube">
+            <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/gajanan_7501" class="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Gajanan Dhobale on Instagram">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.266.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.848 0-3.204.013-3.584.07-4.849.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
+          <a href="/contact.html" class="social-icon" aria-label="Help Desk">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/ebooks.html">Ebooks &amp; Poems</a></li>
+          <li><a href="/subliminals.html">Subliminal Library</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="/contact.html">Help Desk</a></li>
+          <li><a href="/privacy.html">Privacy Policy</a></li>
+          <li><a href="/terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="copyright">&copy; 2026 Good for You. Created with &#x1F49B; by Gajanan Dhobale.</p>
+    </div>
+  </footer>
+
+</section>
+
+<!-- Footer also shown on login gate for non-members -->
+<footer class="site-footer" id="guestFooter" style="display:none;position:relative;z-index:1;">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <h3>Good for You</h3>
+      <p>A dedicated space for human emotions and words of feelings — by Gajanan Dhobale.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/ebooks.html">Ebooks &amp; Poems</a></li>
+        <li><a href="/subliminals.html">Subliminal Library</a></li>
+        <li><a href="/contact.html">Help Desk</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="copyright">&copy; 2026 Good for You. Created with &#x1F49B; by Gajanan Dhobale.</p>
+  </div>
+</footer>
+
+<!-- Back to Top -->
+<button id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">
+  <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/></svg>
+</button>
+
+<!-- Gaia Widget -->
+<button id="gfy-trigger" onclick="gfyToggle()" aria-label="Chat with Gaia AI assistant">
+  <span class="gfy-tip">Ask me anything</span>
+  <svg class="gfy-ico-chat" width="22" height="22" fill="none" viewBox="0 0 24 24">
+    <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="white"/>
+  </svg>
+  <svg class="gfy-ico-close" width="18" height="18" fill="none" viewBox="0 0 24 24">
+    <path d="M18 6L6 18M6 6l12 12" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+  </svg>
+</button>
+<div id="gfy-widget" role="dialog" aria-label="Gaia AI Chat">
+  <div class="gfy-header">
+    <div class="gfy-avatar">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="7" stroke="url(#ga1)" stroke-width="1.5" fill="none"/>
+        <path d="M15.5 12H12v2.5" stroke="url(#ga2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="18.5" cy="5" r="1" fill="#22d3ee" opacity="0.9"/>
+        <circle cx="5.5" cy="18.5" r="0.7" fill="#a78bfa" opacity="0.8"/>
+        <circle cx="19.5" cy="17" r="0.5" fill="#22c55e" opacity="0.7"/>
+        <defs>
+          <linearGradient id="ga1" x1="5" y1="5" x2="19" y2="19"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient>
+          <linearGradient id="ga2" x1="12" y1="12" x2="16" y2="15"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#22c55e"/></linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div>
+      <div class="gfy-name">Gaia</div>
+      <div class="gfy-status"><span class="gfy-dot"></span> Your Good for You guide</div>
+    </div>
+  </div>
+  <div class="gfy-messages" id="gfy-messages">
+    <div class="gfy-msg gfy-bot">
+      <div class="gfy-mini">✦</div>
+      <div class="gfy-bubble">Hi, I'm <strong>Gaia</strong>! I can help with account questions, membership benefits, password resets and more. What do you need? ✨</div>
+    </div>
+  </div>
+  <!-- Contextual suggestions for account page -->
+  <div class="gfy-suggestions" id="gfy-suggestions">
+    <button class="gfy-sug-btn" onclick="gfyQuick('What do members get on Good for You?')">What do members get?</button>
+    <button class="gfy-sug-btn" onclick="gfyQuick('How do I reset my password?')">Reset password</button>
+    <button class="gfy-sug-btn" onclick="gfyQuick('How do I delete my account?')">Delete my account</button>
+    <button class="gfy-sug-btn" onclick="gfyQuick('What is the community section?')">About community</button>
+  </div>
+  <div class="gfy-input-area">
+    <div class="gfy-input-row">
+      <input type="text" id="gfy-input" placeholder="Ask me anything…"/>
+      <button id="gfy-send" onclick="gfySend()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <button class="gfy-reset" onclick="gfyReset()">↺ New conversation</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════
+   HELPERS
+═══════════════════════════════ */
+function getInitials(name, email) {
+  if (name && name !== 'Member') {
+    return name.trim().split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
+  return email ? email[0].toUpperCase() : '?';
+}
+
+function formatJoinDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    return 'Member since ' + new Date(dateStr).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  } catch(e) { return ''; }
+}
+
+/* ═══════════════════════════════
+   UI STATE MANAGEMENT
+═══════════════════════════════ */
+const loginSection   = document.getElementById('loginRequired');
+const accountSection = document.getElementById('accountArea');
+const guestFooter    = document.getElementById('guestFooter');
+const pageLoader     = document.getElementById('pageLoader');
+
+function showLoader()  { pageLoader.classList.remove('hide'); }
+function hideLoader()  { setTimeout(() => pageLoader.classList.add('hide'), 300); }
+
+const histEsc = t => String(t ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function histAgo(t) {
+  const m = Math.floor((Date.now() - t) / 60000);
+  if (m < 1) return 'just now'; if (m < 60) return m + ' min ago';
+  const h = Math.floor(m / 60); if (h < 24) return h + ' hr ago';
+  const d = Math.floor(h / 24); return d < 30 ? d + ' day' + (d > 1 ? 's' : '') + ' ago' : new Date(t).toLocaleDateString();
+}
+async function renderHistory() {
+  for (let i = 0; i < 100 && !window.gfyHist; i++) await new Promise(r => setTimeout(r, 50));
+  if (!window.gfyHist) return;
+  const list = await gfyHist.get();
+  const label = { ebook: '📘 Ebook', poem: '✍️ Poem', shayari: '🪶 Shayari' };
+  document.getElementById('histGrid').innerHTML = list.map(e => {
+    const status = e.p && e.n ? (e.p >= e.n ? 'Finished' : 'Page ' + e.p + ' / ' + e.n) : 'Viewed';
+    return `<a class="hist-card" href="${histEsc(e.url)}">${e.img ? `<img src="${histEsc(e.img)}" alt="" loading="lazy">` : ''}<div><b>${histEsc(e.title)}</b><small>${label[e.k] || ''} · ${status}</small><small>${histAgo(e.t)}</small></div></a>`;
+  }).join('');
+  document.getElementById('histEmpty').style.display = list.length ? 'none' : '';
+  document.getElementById('histClear').style.display = list.length ? '' : 'none';
+}
+document.getElementById('histClear')?.addEventListener('click', async () => { await gfyHist.clear(); renderHistory(); });
+
+function handleUI(user) {
+  if (user && user.isAnonymous) user = null; // anonymous (Shayari) visitors count as logged out here
+  if (user) {
+    renderHistory();
+    // Show account area
+    loginSection.style.display = 'none';
+    guestFooter.style.display = 'none';
+    accountSection.style.display = 'block';
+
+    // Populate profile
+    const name  = user.user_metadata?.full_name || '';
+    const email = user.email || '';
+    document.getElementById('userName').textContent  = name || email.split('@')[0] || 'Member';
+    document.getElementById('userEmail').textContent = email;
+    document.getElementById('joinedDate').textContent = formatJoinDate(user.created_at);
+
+    // Avatar: initials (always shown; try gravatar)
+    const initials = getInitials(name, email);
+    document.getElementById('avatarInitials').textContent = initials;
+
+    // Try to load Gravatar
+    if (email) {
+      const hash = Array.from(email.trim().toLowerCase())
+        .reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+      // Simple hash for gravatar — just use email directly with md5 would need a lib;
+      // show initials as fallback without a full md5 lib
+    }
+
+    // Pre-fill consultation form with user data
+    const nameInput  = document.getElementById('consult-name');
+    const emailInput = document.getElementById('consult-email');
+    if (nameInput  && name)  nameInput.value  = name;
+    if (emailInput && email) emailInput.value = email;
+
+  } else {
+    // Show login gate
+    accountSection.style.display = 'none';
+    loginSection.style.display = 'flex';
+    guestFooter.style.display = 'block';
+  }
+  hideLoader();
+}
+
+/* ═══════════════════════════════
+   NETLIFY IDENTITY
+═══════════════════════════════ */
+// Fallback: if identity widget doesn't load in 5s, show error
+const identityTimeout = setTimeout(() => {
+  if (loginSection.style.display !== 'none' && accountSection.style.display !== 'block') {
+    document.getElementById('identityError').classList.add('show');
+    hideLoader();
+  }
+}, 5000);
+
+function openIdentity(mode) {
+  if (window.gfyAuth) {
+    location.href = mode === 'signup' ? '/signup.html' : '/login.html';
+  } else {
+    document.getElementById('identityError').classList.add('show');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.gfyAuth) {
+    clearTimeout(identityTimeout);
+
+    gfyAuth.on('init', user => {
+      clearTimeout(identityTimeout);
+      handleUI(user);
+    });
+
+    gfyAuth.on('login', user => {
+      handleUI(user);
+    });
+
+    gfyAuth.on('signup', () => {
+      // Show email confirmation message after signup
+      document.getElementById('signupConfirm').classList.add('show');
+      hideLoader();
+    });
+
+    gfyAuth.on('logout', () => {
+      try { localStorage.removeItem('gfyReadHistory'); } catch (e) {}
+      window.location.reload();
+    });
+
+    gfyAuth.on('error', () => {
+      document.getElementById('identityError').classList.add('show');
+      hideLoader();
+    });
+
+    gfyAuth.init();
+
+    document.getElementById('logoutBtn')?.addEventListener('click', () => gfyAuth.logout());
+  } else {
+    // Widget script failed to load
+    document.getElementById('identityError').classList.add('show');
+    hideLoader();
+  }
+});
+
+/* ═══════════════════════════════
+   SECTION PANELS (toggle with active state)
+═══════════════════════════════ */
+const PANELS = ['libraryPanel', 'activityPanel', 'communityPanel', 'consultPanel'];
+const CARDS  = ['card-library', 'card-activity', 'card-community', 'card-consult'];
+
+function togglePanel(panelId, cardId) {
+  const panel = document.getElementById(panelId);
+  const isOpen = panel.classList.contains('open');
+
+  // Close all
+  PANELS.forEach(id => document.getElementById(id).classList.remove('open'));
+  CARDS.forEach(id => {
+    const c = document.getElementById(id);
+    c.classList.remove('active');
+    c.setAttribute('aria-selected', 'false');
+  });
+
+  if (!isOpen) {
+    panel.classList.add('open');
+    document.getElementById(cardId).classList.add('active');
+    document.getElementById(cardId).setAttribute('aria-selected', 'true');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Load Disqus lazily only when community opens
+    if (panelId === 'communityPanel') loadDisqus();
+    if (panelId === 'activityPanel') loadActivities();
+  }
+}
+
+/* ═══════════════════════════════
+   DISQUS
+═══════════════════════════════ */
+function loadDisqus() {
+  if (window.disqus_loaded) {
+    document.getElementById('disqusLoading').style.display = 'none';
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = 'https://growforyou.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  s.onload = () => { document.getElementById('disqusLoading').style.display = 'none'; };
+  (document.head || document.body).appendChild(s);
+  window.disqus_loaded = true;
+  window.disqus_config = function() {
+    this.page.url = 'https://growforyou.in/account.html';
+    this.page.identifier = 'gfy-community';
+  };
+}
+
+/* ═══════════════════════════════
+   CONSULTATION FORM
+═══════════════════════════════ */
+document.getElementById('consultForm')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('consultSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Sending…`;
+  const fd = new FormData(this);
+  fetch('/', { method: 'POST', body: fd })
+    .then(() => { this.style.display = 'none'; document.getElementById('consultSuccess').classList.add('show'); })
+    .catch(() => { this.style.display = 'none'; document.getElementById('consultSuccess').classList.add('show'); });
+});
+
+/* ─── Floating menu (draggable; opens /drawer.js menu) ─── */
+(() => {
+  const b = document.getElementById('menuBtn'); let down = false, moved = 0, ox = 0, oy = 0, sx = 0, sy = 0;
+  b.addEventListener('pointerdown', e => { down = true; moved = 0; sx = e.clientX; sy = e.clientY; ox = e.clientX - b.offsetLeft; oy = e.clientY - b.offsetTop; b.setPointerCapture(e.pointerId); b.style.cursor = 'grabbing' });
+  b.addEventListener('pointermove', e => { if (!down) return; moved = Math.max(moved, Math.hypot(e.clientX - sx, e.clientY - sy)); if (moved < 6) return;
+    b.style.left = Math.max(10, Math.min(innerWidth - 65, e.clientX - ox)) + 'px'; b.style.top = Math.max(10, Math.min(innerHeight - 65, e.clientY - oy)) + 'px';
+    const m = document.getElementById('gfyDrawer'); if (m) { m.style.left = b.style.left; m.style.top = (parseFloat(b.style.top) + 60) + 'px' } });
+  b.addEventListener('pointerup', () => { down = false; b.style.cursor = 'grab'; if (moved < 6 && window.openDrawer) window.openDrawer(b) });
+})();
+
+/* ═══════════════════════════════
+   BACK TO TOP
+═══════════════════════════════ */
+window.addEventListener('scroll', () => {
+  document.getElementById('backTop').classList.toggle('show', window.scrollY > 300);
+}, { passive: true });
+
+/* ═══════════════════════════════
+   SERVICE WORKER
+═══════════════════════════════ */
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+
+/* ═══════════════════════════════
+   GAIA WIDGET
+═══════════════════════════════ */
+const GFY_BACKEND = "https://my-ai-bot-2-r6q6.onrender.com";
+let gfyHistory = [], gfyBusy = false;
+
+function gfyToggle() {
+  document.getElementById('gfy-widget').classList.toggle('open');
+  document.getElementById('gfy-trigger').classList.toggle('open');
+}
+function gfyQuick(text) {
+  document.getElementById('gfy-input').value = text;
+  document.getElementById('gfy-suggestions').style.display = 'none';
+  gfySend();
+}
+async function gfySend() {
+  if (gfyBusy) return;
+  const input = document.getElementById('gfy-input');
+  const text = input.value.trim(); if (!text) return;
+  gfyAddMsg(text, 'gfy-user'); input.value = ''; gfySetBusy(true);
+  gfyHistory.push({ role: "user", content: text }); gfyShowTyping();
+  try {
+    const res = await fetch(`${GFY_BACKEND}/chat`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: gfyHistory })
+    });
+    const data = await res.json(); gfyRemoveTyping();
+    if (data.reply) { gfyAddMsg(data.reply, 'gfy-bot'); gfyHistory.push({ role: "assistant", content: data.reply }); }
+    else gfyAddMsg("Something went wrong. Please try again.", 'gfy-bot');
+  } catch(err) {
+    gfyRemoveTyping();
+    gfyAddMsg("Can't connect right now. Please visit growforyou.in/contact for help.", 'gfy-bot');
+  }
+  gfySetBusy(false);
+}
+function gfySetBusy(b) { gfyBusy = b; document.getElementById('gfy-input').disabled = b; document.getElementById('gfy-send').disabled = b; }
+function gfyAddMsg(text, cls) {
+  const msgs = document.getElementById('gfy-messages');
+  const div = document.createElement('div'); div.className = `gfy-msg ${cls}`;
+  div.innerHTML = cls === 'gfy-bot' ? `<div class="gfy-mini">✦</div><div class="gfy-bubble">${text}</div>` : `<div class="gfy-bubble">${text}</div>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+function gfyShowTyping() {
+  const msgs = document.getElementById('gfy-messages');
+  const div = document.createElement('div'); div.className = 'gfy-msg gfy-bot'; div.id = 'gfy-typing';
+  div.innerHTML = `<div class="gfy-mini">✦</div><div class="gfy-typing"><div class="gfy-tdot"></div><div class="gfy-tdot"></div><div class="gfy-tdot"></div></div>`;
+  msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+}
+function gfyRemoveTyping() { const el = document.getElementById('gfy-typing'); if(el) el.remove(); }
+function gfyReset() {
+  gfyHistory = [];
+  document.getElementById('gfy-messages').innerHTML = `<div class="gfy-msg gfy-bot"><div class="gfy-mini">✦</div><div class="gfy-bubble">Fresh start! What can I help you with? ✨</div></div>`;
+  document.getElementById('gfy-suggestions').style.display = 'flex';
+}
+document.getElementById('gfy-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); gfySend(); }
+});
+</script>
+
+</body>
+</html>

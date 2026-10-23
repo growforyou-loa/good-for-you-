@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Good for You</title>
+<meta name="theme-color" content="#0b1120">
+<link rel="icon" href="/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="module" src="/firebase-auth.js"></script>
+<script src="/drawer.js" defer></script>
+<style>
+:root{--primary:#6366f1;--secondary:#22d3ee;--ok:#4ade80;--bad:#f87171;--text:#e5e7eb;--mut:#8b8fa8;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.1)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;color:var(--text);background:#030712;overflow-x:hidden;position:relative}
+#gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#030712;z-index:50;font-size:.95rem;color:var(--mut);text-align:center;padding:20px}
+header{position:relative;z-index:2;padding:30px 16px 6px 84px;display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:980px;margin:0 auto}
+header h1{font-size:1.25rem;font-weight:700}
+header h1 span{background:linear-gradient(90deg,#6366f1,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+header a,header button{font-size:.8rem;color:var(--secondary);text-decoration:none;background:none;border:0;cursor:pointer}
+nav{display:flex;gap:6px;padding:12px 16px;overflow-x:auto;border-bottom:1px solid var(--line)}
+nav button{flex:none;padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:.85rem;cursor:pointer}
+nav button.on{background:linear-gradient(135deg,#6366f1,#22d3ee);border-color:transparent;font-weight:600}
+main{max-width:980px;margin:0 auto;padding:18px 16px 80px}
+.panel{display:none}.panel.on{display:block}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat b{display:block;font-size:1.7rem}.stat span{font-size:.78rem;color:var(--mut)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.bar input,.bar select{flex:1;min-width:140px}
+input,select,textarea{width:100%;padding:11px 13px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;font-size:.9rem;outline:none}
+select option{background:#0b1120}
+input:focus,select:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(99,102,241,.2)}
+textarea{min-height:110px;resize:vertical}
+label{display:block;font-size:.78rem;color:var(--mut);margin:12px 0 5px}
+.btn{padding:10px 16px;border-radius:11px;border:0;background:linear-gradient(135deg,#6366f1,#22d3ee);color:#fff;font-weight:600;font-size:.85rem;cursor:pointer}
+.btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--text);font-weight:500}
+.btn.red{background:rgba(248,113,113,.15);color:var(--bad);border:1px solid rgba(248,113,113,.3)}
+.btn.sm{padding:6px 11px;font-size:.74rem;border-radius:8px}
+.btn:disabled{opacity:.55;cursor:wait}
+.item{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:10px}
+.item img,.item .ph{width:54px;height:70px;border-radius:8px;object-fit:cover;background:#1a1f35;flex:none;display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.item .meta{flex:1;min-width:0}
+.item .meta b{display:block;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .meta small{color:var(--mut);font-size:.74rem}
+.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-block;font-size:.66rem;padding:2px 8px;border-radius:999px;margin-right:4px;border:1px solid var(--line)}
+.pill.g{color:var(--ok);border-color:rgba(74,222,128,.4)}.pill.y{color:#fbbf24;border-color:rgba(251,191,36,.4)}.pill.r{color:var(--bad);border-color:rgba(248,113,113,.4)}
+.empty{text-align:center;color:var(--mut);padding:40px 10px;font-size:.9rem}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:flex-start;justify-content:center;z-index:40;overflow:auto;padding:16px}
+.modal.on{display:flex}
+.box{background:#0e1426;border:1px solid var(--line);border-radius:20px;padding:20px;width:100%;max-width:560px;margin:auto}
+.box h2{font-size:1.1rem;margin-bottom:6px}
+.row{display:grid;gap:12px}@media(min-width:560px){.row.two{grid-template-columns:1fr 1fr}}
+.up{border:1px dashed rgba(255,255,255,.25);border-radius:12px;padding:12px;font-size:.82rem}
+.up .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.th{position:relative;width:64px}
+.th img{width:64px;height:86px;object-fit:cover;border-radius:8px;display:block}
+.th .n{position:absolute;top:2px;left:2px;background:rgba(0,0,0,.7);border-radius:6px;font-size:.62rem;padding:1px 5px}
+.th .c{display:flex;justify-content:space-between;margin-top:3px}
+.th .c button{background:rgba(255,255,255,.1);border:0;color:#fff;border-radius:5px;width:19px;height:19px;font-size:.65rem;cursor:pointer}
+.prog{height:5px;border-radius:5px;background:rgba(255,255,255,.1);margin-top:8px;overflow:hidden;display:none}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#22d3ee)}
+.msg{font-size:.82rem;margin-top:10px;min-height:1.1em;color:var(--bad)}.msg.ok{color:var(--ok)}
+.chk{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+.chk input{width:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{color:var(--mut);font-weight:500;font-size:.72rem}
+.tw{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:orbFloat ease-in-out infinite}
+.bg-orb-1{width:600px;height:600px;background:#6366f1;top:-10%;left:-10%;animation-duration:18s}
+.bg-orb-2{width:500px;height:500px;background:#22d3ee;top:30%;right:-10%;animation-duration:22s;animation-delay:-8s}
+.bg-orb-3{width:400px;height:400px;background:#a78bfa;bottom:10%;left:20%;animation-duration:15s;animation-delay:-4s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.05)}66%{transform:translate(-20px,40px) scale(.95)}}
+.menu-btn{position:fixed;top:24px;left:20px;width:52px;height:52px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(10,15,30,.85);backdrop-filter:blur(16px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:grab;z-index:2000;touch-action:none;transition:border-color .3s}
+.menu-btn:hover{border-color:rgba(34,211,238,.4)}
+.menu-btn span{height:1.5px;width:22px;background:#e5e7eb;border-radius:2px}
+main,nav{position:relative;z-index:1}
+nav{border-bottom:0;padding-top:14px;max-width:980px;margin:0 auto}
+nav button{backdrop-filter:blur(12px);transition:border-color .3s}
+nav button:hover{border-color:rgba(34,211,238,.4)}
+.stat,.item,.tw{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:20px;transition:border-color .3s}
+.stat:hover,.item:hover{border-color:rgba(34,211,238,.35)}
+.box{background:rgba(8,12,28,.97);border-radius:24px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.btn{border-radius:12px}
+.sub{font-size:.76rem;color:var(--mut);margin-bottom:10px}
+.two-col{display:grid;gap:12px}@media(min-width:720px){.two-col{grid-template-columns:1fr 1fr}}
+.list-line{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.84rem}
+.list-line:last-child{border-bottom:0}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:rgba(8,12,28,.97);border:1px solid rgba(74,222,128,.4);color:var(--ok);padding:11px 18px;border-radius:14px;font-size:.84rem;opacity:0;pointer-events:none;transition:.25s;z-index:100;max-width:92vw;text-align:center;backdrop-filter:blur(16px)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+#toast.bad{border-color:rgba(248,113,113,.45);color:var(--bad)}
+</style>
+</head>
+<body>
+<div id="gate">Checking admin access…</div>
+<div class="bg-canvas" aria-hidden="true"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="bg-orb bg-orb-3"></div></div>
+<button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+<div id="toast" role="status"></div>
+
+<header>
+  <h1>⚙️ <span>Good for You</span> Admin</h1>
+  <div><a href="/">Site</a> · <button id="logout">Logout</button></div>
+</header>
+<nav id="tabs">
+  <button data-t="dash" class="on">Dashboard</button>
+  <button data-t="content">Content</button>
+  <button data-t="users">Users</button>
+  <button data-t="shay">Shayari</button>
+</nav>
+
+<main>
+  <!-- Dashboard -->
+  <section class="panel on" id="p-dash">
+    <div class="stats">
+      <div class="stat"><b id="sUsers">–</b><span>Members</span></div>
+      <div class="stat"><b id="sWeek">–</b><span>Signups · 7 days</span></div>
+      <div class="stat"><b id="sEbooks">–</b><span>Ebooks</span></div>
+      <div class="stat"><b id="sPoems">–</b><span>Poems</span></div>
+      <div class="stat"><b id="sSubs">–</b><span>Subliminals</span></div>
+      <div class="stat"><b id="sDrafts">–</b><span>Drafts (hidden)</span></div>
+      <div class="stat"><b id="sShay">–</b><span>Shayari live / hidden</span></div>
+      <div class="stat"><b id="sLikes">–</b><span>Shayari likes</span></div>
+    </div>
+    <div class="two-col">
+      <div class="stat"><span>Recent signups</span><div id="recent" style="margin-top:8px;font-size:.85rem"></div></div>
+      <div class="stat"><span>Most opened (signed-in members)</span><div id="topOpened" style="margin-top:8px;font-size:.85rem"></div></div>
+    </div>
+  </section>
+
+  <!-- Content -->
+  <section class="panel" id="p-content">
+    <div class="bar">
+      <input id="cSearch" placeholder="Search title…"><select id="fStatus"><option value="">All status</option><option value="published">Published</option><option value="draft">Drafts</option></select>
+      <select id="fType"><option value="">All types</option><option value="ebook">Ebooks</option><option value="poem">Poems</option><option value="subliminal">Subliminals</option></select>
+      <button class="btn" id="addBtn">+ Add content</button>
+    </div>
+    <div id="clist"></div>
+  </section>
+
+  <!-- Users -->
+  <section class="panel" id="p-users">
+    <div class="bar"><input id="uSearch" placeholder="Search name or email…"><select id="uFilter"><option value="">All users</option><option value="active">Active</option><option value="blocked">Blocked</option></select><button class="btn ghost" id="uExport">Export CSV</button></div>
+    <div class="tw"><table><thead><tr><th>User</th><th>Joined</th><th>Last login</th><th>Status</th><th></th></tr></thead><tbody id="ubody"></tbody></table></div>
+  </section>
+  <!-- Shayari -->
+  <section class="panel" id="p-shay">
+    <div class="bar"><input id="shSearch" placeholder="Search by uploader…"><select id="shSort"><option value="new">Newest</option><option value="likes">Most liked</option><option value="dislikes">Most disliked</option></select><select id="shFilter"><option value="">All</option><option value="published">Live</option><option value="hidden">Hidden</option></select><span id="shCount" style="font-size:.8rem;color:var(--mut)"></span></div>
+    <div id="shlist"></div>
+  </section>
+</main>
+
+<!-- Content modal -->
+<div class="modal" id="cModal"><div class="box">
+  <h2 id="cTitle">Add content</h2>
+  <label>Type</label>
+  <select id="cType"><option value="ebook">Ebook (page images)</option><option value="poem">Poem (images or text)</option><option value="subliminal">Subliminal (audio)</option></select>
+  <div class="row two">
+    <div><label>Title *</label><input id="cName"></div>
+    <div><label>Author</label><input id="cAuthor" value="Gajanan Dhobale"></div>
+  </div>
+  <label>Summary</label><textarea id="cSummary" style="min-height:70px"></textarea>
+  <div class="row two">
+    <div><label>Keywords / tag line</label><input id="cKeys" placeholder="e.g. Mindset · Growth"></div>
+    <div><label>Read time / duration</label><input id="cRead" placeholder="~2 min read"></div>
+  </div>
+  <div class="row two">
+    <div><label>Access</label><select id="cAccess"><option value="free">Free (everyone)</option><option value="members">Members only</option></select></div>
+    <div><label>Status</label><select id="cStatus"><option value="published">Published</option><option value="draft">Draft (hidden)</option></select></div>
+  </div>
+
+  <label>Cover image</label>
+  <div class="up"><input type="file" id="cCoverFile" accept="image/*"><div class="thumbs" id="cCoverPrev"></div><div class="prog" id="pCover"><i></i></div></div>
+
+  <div id="boxPages"><label>Book pages (select images or a PDF — PDF pages are converted automatically, in order)</label>
+    <div class="up"><input type="file" id="cPagesFile" accept="image/*,application/pdf,.pdf" multiple><div class="thumbs" id="cPagesPrev"></div><div class="prog" id="pPages"><i></i></div></div></div>
+
+  <div id="boxAudio"><label>Audio file (mp3)</label>
+    <div class="up"><input type="file" id="cAudioFile" accept="audio/*"><div id="cAudioPrev" style="margin-top:8px;font-size:.78rem;word-break:break-all"></div><div class="prog" id="pAudio"><i></i></div></div></div>
+
+  <div id="boxText"><label>Poem text (optional if you upload page images)</label><textarea id="cText" style="min-height:180px"></textarea></div>
+
+  <div class="msg" id="cMsg"></div>
+  <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
+    <button class="btn ghost" id="cCancel">Cancel</button>
+    <button class="btn" id="cSave">Save</button>
+  </div>
+</div></div>
+
+<!-- Access modal -->
+<div class="modal" id="aModal"><div class="box">
+  <h2 id="aTitle">Library access</h2>
+  <p style="font-size:.78rem;color:var(--mut);margin:4px 0 10px">Tick the members-only items this user can open.</p>
+  <div style="display:flex;gap:8px;margin-bottom:6px"><button class="btn ghost sm" id="aAll">Select all</button><button class="btn ghost sm" id="aNone">Clear all</button></div>
+  <div id="aList"></div>
+  <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
+    <button class="btn ghost" id="aCancel">Cancel</button>
+    <button class="btn" id="aSave">Save</button>
+  </div>
+</div></div>
+
+<script type="module">
+import { collection, doc, getDocs, setDoc, updateDoc, deleteDoc }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* ─── CONFIG ─── */
+const ADMIN_EMAILS = ['gajanandhoble5@gmail.com'];   // keep in sync with firestore.rules
+const CLOUD_NAME   = 'a7z3drop';
+const UPLOAD_PRESET = 'gfy-umsigned';                 // must match the preset name in Cloudinary exactly
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = d => { const t = new Date(d); return isNaN(t) ? '–' : t.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); };
+const errMsg = e => e && e.code === 'permission-denied' ? 'Permission denied — check Firestore rules and that your admin email is verified.' : (e && e.message) || 'Something went wrong';
+const toast = (t, bad) => { const el = $('toast'); el.textContent = t; el.className = 'on' + (bad ? ' bad' : ''); clearTimeout(toast.t); toast.t = setTimeout(() => el.className = '', 3200); };
+async function run(fn, ok) { try { await fn(); if (ok) toast(ok); } catch (e) { console.error(e); toast(errMsg(e), true); } }
+let db, content = [], users = [], editing = null, form = {cover:'', pages:[], audio:''}, accessUid = null;
+
+/* ─── Gate ─── */
+function boot() {
+  if (!window.gfyAuth) return setTimeout(boot, 50);
+  db = gfyAuth.db;
+  gfyAuth.on('init', async u => {
+    if (!u || u.isAnonymous) return location.replace('/login.html?next=/admin.html');
+    const ok = ADMIN_EMAILS.includes((u.email || '').toLowerCase());
+    if (!ok) return location.replace('/');
+    if (!u.emailVerified) { $('gate').innerHTML = 'Please verify your email first (check your inbox), then reload this page.'; return; }
+    $('gate').style.display = 'none';
+    try { await Promise.all([loadContent(), loadUsers(), loadShayari()]); } catch (e) { console.error(e); toast('Couldn\'t load data: ' + errMsg(e), true); }
+  });
+  gfyAuth.init();
+}
+boot();
+$('logout').onclick = () => gfyAuth.logout().then(() => location.href = '/');
+
+/* ─── Tabs ─── */
+document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-' + b.dataset.t));
+});
+
+/* ─── Load ─── */
+async function loadContent() {
+  const snap = await getDocs(collection(db, 'content'));
+  content = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.order || 0) - (a.order || 0));
+  renderContent(); stats();
+}
+async function loadUsers() {
+  const snap = await getDocs(collection(db, 'users'));
+  users = snap.docs.map(d => ({ uid: d.id, ...d.data() })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  renderUsers(); stats();
+}
+function stats() {
+  const real = users.filter(u => u.email), pub = shay.filter(x => x.status === 'published');
+  $('sUsers').textContent = real.length;
+  $('sWeek').textContent = real.filter(u => Date.now() - new Date(u.createdAt) < 7 * 864e5).length;
+  $('sEbooks').textContent = content.filter(c => c.type === 'ebook').length;
+  $('sPoems').textContent = content.filter(c => c.type === 'poem').length;
+  $('sSubs').textContent = content.filter(c => c.type === 'subliminal').length;
+  $('sDrafts').textContent = content.filter(c => c.status !== 'published').length;
+  $('sShay').textContent = pub.length + ' / ' + (shay.length - pub.length);
+  $('sLikes').textContent = shay.reduce((n, x) => n + (x.likes || 0), 0);
+  $('recent').innerHTML = real.slice(0, 5).map(u => `<div class="list-line"><span>${esc(u.name || u.email)}</span><span style="color:var(--mut)">${fmt(u.createdAt)}</span></div>`).join('') || 'No users yet';
+  const tally = {};
+  users.forEach(u => (u.readHistory || []).forEach(e => { const k = e.k + ':' + e.id; (tally[k] = tally[k] || { e, n: 0 }).n++; }));
+  $('topOpened').innerHTML = Object.values(tally).sort((x, y) => y.n - x.n).slice(0, 5)
+    .map(t => `<div class="list-line"><span>${esc(t.e.title)}</span><span style="color:var(--mut)">${t.n} reader${t.n > 1 ? 's' : ''}</span></div>`).join('') || '<span style="color:var(--mut)">No reading data yet</span>';
+}
+
+/* ─── Content list ─── */
+const ICON = { ebook: '📚', poem: '📜', subliminal: '🎧' };
+$('fType').onchange = $('fStatus').onchange = renderContent;
+$('cSearch').oninput = renderContent;
+function renderContent() {
+  const f = $('fType').value;
+  const q = $('cSearch').value.toLowerCase(), st = $('fStatus').value;
+  const list = content.filter(c => (!f || c.type === f) && (!st || c.status === st) && (!q || (c.title || '').toLowerCase().includes(q)));
+  $('clist').innerHTML = list.length ? list.map(c => `
+    <div class="item">
+      ${c.cover ? `<img src="${esc(c.cover)}" alt="">` : `<div class="ph">${ICON[c.type] || '📄'}</div>`}
+      <div class="meta"><b>${esc(c.title)}</b>
+        <small>${esc(c.type)} · ${esc(c.author || '')}</small><br>
+        <span class="pill ${c.status === 'published' ? 'g' : 'y'}">${esc(c.status)}</span><span class="pill ${c.access === 'members' ? 'r' : ''}">${c.access === 'members' ? 'members' : 'free'}</span>
+      </div>
+      <div class="acts">
+        <button class="btn ghost sm" data-a="up" data-id="${c.id}">↑</button>
+        <button class="btn ghost sm" data-a="down" data-id="${c.id}">↓</button>
+        <button class="btn ghost sm" data-a="pub" data-id="${c.id}">${c.status === 'published' ? 'Hide' : 'Publish'}</button>
+        <button class="btn ghost sm" data-a="edit" data-id="${c.id}">Edit</button>
+        <button class="btn ghost sm" data-a="dup" data-id="${c.id}">Duplicate</button>
+        ${c.status === 'published' ? `<a class="btn ghost sm" style="text-decoration:none" target="_blank" rel="noopener" href="${c.type === 'subliminal' ? '/subliminals.html' : '/reader.html?id=' + encodeURIComponent(c.id)}">Preview</a>` : ''}
+        <button class="btn red sm" data-a="del" data-id="${c.id}">Delete</button>
+      </div>
+    </div>`).join('') : '<div class="empty">No content yet. Tap “+ Add content”.</div>';
+}
+$('clist').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const c = content.find(x => x.id === b.dataset.id); if (!c) return;
+  const a = b.dataset.a;
+  if (a === 'edit') return openForm(c);
+  if (a === 'pub') return run(async () => { await updateDoc(doc(db, 'content', c.id), { status: c.status === 'published' ? 'draft' : 'published' }); await loadContent(); }, c.status === 'published' ? 'Hidden (now a draft)' : 'Published');
+  if (a === 'dup') return run(async () => { const { id, ...d } = c; await setDoc(doc(collection(db, 'content')), { ...d, title: c.title + ' (copy)', status: 'draft', order: Date.now(), createdAt: new Date().toISOString() }); await loadContent(); }, 'Duplicated as a draft');
+  if (a === 'del') { if (!confirm(`Delete “${c.title}”? (Files stay in Cloudinary.)`)) return; return run(async () => { await deleteDoc(doc(db, 'content', c.id)); await loadContent(); }, 'Deleted'); }
+  if (a === 'up' || a === 'down') {
+    const i = content.indexOf(c), j = a === 'up' ? i - 1 : i + 1, o = content[j]; if (!o) return;
+    return run(async () => { await Promise.all([updateDoc(doc(db, 'content', c.id), { order: o.order }), updateDoc(doc(db, 'content', o.id), { order: c.order })]); await loadContent(); });
+  }
+};
+
+/* ─── Cloudinary upload ─── */
+function upload(file, bar) {
+  return new Promise((res, rej) => {
+    const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', UPLOAD_PRESET);
+    const x = new XMLHttpRequest();
+    x.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`);
+    bar.style.display = 'block';
+    x.upload.onprogress = e => { if (e.lengthComputable) bar.firstElementChild.style.width = (e.loaded / e.total * 100) + '%'; };
+    x.onload = () => { bar.style.display = 'none'; bar.firstElementChild.style.width = 0;
+      try { const j = JSON.parse(x.responseText); x.status < 300 ? res(j.secure_url) : rej(new Error(j.error?.message || 'Upload failed')); } catch { rej(new Error('Upload failed')); } };
+    x.onerror = () => { bar.style.display = 'none'; rej(new Error('Network error')); };
+    x.send(fd);
+  });
+}
+const cmsg = (t, ok) => { $('cMsg').textContent = t; $('cMsg').className = 'msg' + (ok ? ' ok' : ''); };
+
+$('cCoverFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; cmsg('Uploading cover…', true);
+  try { form.cover = await upload(f, $('pCover')); cmsg('Cover uploaded.', true); } catch (er) { cmsg(er.message); } drawThumbs(); };
+/* ─── PDF → page images (PDF.js, loaded only when a PDF is picked) ─── */
+const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+function loadPdfJs() {
+  if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  return new Promise((res, rej) => {
+    const sc = document.createElement('script'); sc.src = PDFJS + 'pdf.min.js';
+    sc.onload = () => { pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js'; res(pdfjsLib); };
+    sc.onerror = () => rej(new Error('Could not load PDF converter. Check your connection.'));
+    document.head.appendChild(sc);
+  });
+}
+async function uploadPdfPages(file) {
+  const lib = await loadPdfJs();
+  const pdf = await lib.getDocument({ data: await file.arrayBuffer() }).promise;
+  const base = file.name.replace(/\.pdf$/i, '');
+  try {
+    for (let n = 1; n <= pdf.numPages; n++) {
+      cmsg(`${file.name}: converting & uploading page ${n} of ${pdf.numPages}…`, true);
+      const pg = await pdf.getPage(n), vp1 = pg.getViewport({ scale: 1 });
+      const vp = pg.getViewport({ scale: Math.min(2, 1400 / vp1.width) });
+      const cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+      const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+      await pg.render({ canvasContext: ctx, viewport: vp }).promise;
+      const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', 0.85));
+      cv.width = cv.height = 0; pg.cleanup();
+      if (!blob) throw new Error('Could not convert page ' + n);
+      form.pages.push(await upload(new File([blob], `${base}-p${String(n).padStart(3, '0')}.jpg`, { type: 'image/jpeg' }), $('pPages')));
+      drawThumbs();
+    }
+  } finally { pdf.destroy(); }
+}
+$('cPagesFile').onchange = async e => { cmsg('Uploading pages…', true);
+  const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      if (f.type === 'application/pdf' || /\.pdf$/i.test(f.name)) await uploadPdfPages(f);
+      else { cmsg(`Uploading page ${i + 1} of ${files.length}…`, true); form.pages.push(await upload(f, $('pPages'))); drawThumbs(); }
+    }
+    cmsg('Pages uploaded.', true); }
+  catch (er) { cmsg(er.message || 'Upload failed'); } e.target.value = ''; };
+$('cAudioFile').onchange = async e => { const f = e.target.files[0]; if (!f) return; cmsg('Uploading audio…', true);
+  try { form.audio = await upload(f, $('pAudio')); cmsg('Audio uploaded.', true); } catch (er) { cmsg(er.message); } drawThumbs(); };
+
+function drawThumbs() {
+  $('cCoverPrev').innerHTML = form.cover ? `<div class="th"><img src="${esc(form.cover)}"></div>` : '';
+  $('cPagesPrev').innerHTML = form.pages.map((u, i) => `<div class="th"><span class="n">${i + 1}</span><img src="${esc(u)}"><div class="c"><button data-p="l" data-i="${i}">◀</button><button data-p="x" data-i="${i}">✕</button><button data-p="r" data-i="${i}">▶</button></div></div>`).join('');
+  $('cAudioPrev').innerHTML = form.audio ? `✅ ${esc(form.audio)}<br><audio controls src="${esc(form.audio)}" style="width:100%;margin-top:6px"></audio>` : '';
+}
+$('cPagesPrev').onclick = e => { const b = e.target.closest('button'); if (!b) return; const i = +b.dataset.i, p = form.pages;
+  if (b.dataset.p === 'x') p.splice(i, 1);
+  else { const j = b.dataset.p === 'l' ? i - 1 : i + 1; if (p[j] !== undefined) [p[i], p[j]] = [p[j], p[i]]; }
+  drawThumbs(); };
+
+/* ─── Content form ─── */
+function typeUI() { const t = $('cType').value;
+  $('boxPages').style.display = (t === 'ebook' || t === 'poem') ? 'block' : 'none';
+  $('boxAudio').style.display = t === 'subliminal' ? 'block' : 'none';
+  $('boxText').style.display = t === 'poem' ? 'block' : 'none'; }
+$('cType').onchange = typeUI;
+function openForm(c) {
+  editing = c || null; cmsg('');
+  $('cTitle').textContent = c ? 'Edit content' : 'Add content';
+  $('cType').value = c?.type || 'ebook'; $('cType').disabled = !!c;
+  $('cName').value = c?.title || ''; $('cAuthor').value = c?.author ?? 'Gajanan Dhobale';
+  $('cSummary').value = c?.summary || ''; $('cKeys').value = c?.keywords || ''; $('cRead').value = c?.readTime || '';
+  $('cAccess').value = c?.access || 'free'; $('cStatus').value = c?.status || 'published';
+  $('cText').value = c?.text || '';
+  form = { cover: c?.cover || '', pages: [...(c?.pages || [])], audio: c?.audio || '' };
+  $('cCoverFile').value = ''; $('cAudioFile').value = '';
+  typeUI(); drawThumbs(); $('cModal').classList.add('on');
+}
+$('addBtn').onclick = () => openForm();
+$('cCancel').onclick = () => $('cModal').classList.remove('on');
+$('cSave').onclick = async () => {
+  const type = $('cType').value, title = $('cName').value.trim();
+  if (!title) return cmsg('Title is required.');
+  if (type === 'ebook' && !form.pages.length) return cmsg('Upload at least one page image.');
+  if (type === 'subliminal' && !form.audio) return cmsg('Upload the audio file.');
+  if (type === 'poem' && !$('cText').value.trim() && !form.pages.length) return cmsg('Add poem text or upload page images.');
+  const data = { type, title, author: $('cAuthor').value.trim(), summary: $('cSummary').value.trim(), keywords: $('cKeys').value.trim(),
+    readTime: $('cRead').value.trim(), access: $('cAccess').value, status: $('cStatus').value, cover: form.cover,
+    pages: (type === 'ebook' || type === 'poem') ? form.pages : [], audio: type === 'subliminal' ? form.audio : '', text: type === 'poem' ? $('cText').value : '' };
+  $('cSave').disabled = true;
+  try {
+    if (editing) await updateDoc(doc(db, 'content', editing.id), data);
+    else { const ref = doc(collection(db, 'content')); await setDoc(ref, { ...data, order: Date.now(), createdAt: new Date().toISOString() }); }
+    $('cModal').classList.remove('on'); await loadContent(); toast('Saved');
+  } catch (er) { cmsg('Save failed: ' + er.message); }
+  $('cSave').disabled = false;
+};
+
+/* ─── Users ─── */
+$('uSearch').oninput = renderUsers; $('uFilter').onchange = renderUsers;
+$('uExport').onclick = () => {
+  const cell = v => { v = String(v ?? ''); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+  const rows = [['Name', 'Email', 'Joined', 'Last login', 'Status', 'Items with access']].concat(users.filter(u => u.email).map(u => [u.name || '', u.email, u.createdAt || '', u.lastLogin || '', u.blocked ? 'blocked' : 'active', (u.libraryAccess || []).length]));
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\n')], { type: 'text/csv' }));
+  a.download = 'gfy-users.csv'; a.click(); toast('Exported ' + (rows.length - 1) + ' users');
+};
+function renderUsers() {
+  const q = $('uSearch').value.toLowerCase();
+  const f = $('uFilter').value;
+  const list = users.filter(u => (!q || (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)) && (f === 'blocked' ? u.blocked : f === 'active' ? !u.blocked : true));
+  $('ubody').innerHTML = list.length ? list.map(u => `<tr>
+    <td><b>${esc(u.name || (u.email ? '—' : 'Anonymous visitor'))}</b><br><small style="color:var(--mut)">${esc(u.email || u.uid)}</small></td>
+    <td>${fmt(u.createdAt)}</td><td>${fmt(u.lastLogin)}</td>
+    <td><span class="pill ${u.blocked ? 'r' : 'g'}">${u.blocked ? 'blocked' : 'active'}</span></td>
+    <td><div class="acts"><button class="btn ghost sm" data-a="acc" data-id="${u.uid}">Access (${(u.libraryAccess || []).length})</button>
+    <button class="btn ${u.blocked ? 'ghost' : 'red'} sm" data-a="blk" data-id="${u.uid}">${u.blocked ? 'Unblock' : 'Block'}</button></div></td></tr>`).join('')
+    : '<tr><td colspan="5" class="empty">No users found.</td></tr>';
+}
+$('ubody').onclick = async e => {
+  const b = e.target.closest('button'); if (!b) return; const u = users.find(x => x.uid === b.dataset.id); if (!u) return;
+  if (b.dataset.a === 'blk') return run(async () => { await setDoc(doc(db, 'users', u.uid), { blocked: !u.blocked }, { merge: true }); await loadUsers(); }, u.blocked ? 'Unblocked' : 'Blocked');
+  if (b.dataset.a === 'acc') {
+    accessUid = u.uid; $('aTitle').textContent = 'Access — ' + (u.name || u.email);
+    const m = content.filter(c => c.access === 'members');
+    $('aList').innerHTML = m.length ? m.map(c => `<label class="chk"><input type="checkbox" value="${c.id}" ${(u.libraryAccess || []).includes(c.id) ? 'checked' : ''}> ${ICON[c.type]} ${esc(c.title)}</label>`).join('')
+      : '<div class="empty">No members-only content yet.</div>';
+    $('aModal').classList.add('on');
+  }
+};
+$('aCancel').onclick = () => $('aModal').classList.remove('on');
+$('aAll').onclick = () => $('aList').querySelectorAll('input').forEach(i => i.checked = true);
+$('aNone').onclick = () => $('aList').querySelectorAll('input').forEach(i => i.checked = false);
+$('aSave').onclick = async () => {
+  const ids = [...$('aList').querySelectorAll('input:checked')].map(i => i.value);
+  run(async () => { await updateDoc(doc(db, 'users', accessUid), { libraryAccess: ids }); $('aModal').classList.remove('on'); await loadUsers(); }, 'Access saved');
+};
+
+/* ─── Shayari moderation ─── */
+let shay = [];
+async function loadShayari() {
+  const snap = await getDocs(collection(db, 'shayari'));
+  shay = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderShay(); stats();
+}
+function renderShay() {
+  const q = $('shSearch').value.toLowerCase(), f = $('shFilter').value, sort = $('shSort').value;
+  const list = shay.filter(s => (!q || (s.name || '').toLowerCase().includes(q)) && (!f || s.status === f))
+    .sort((a, b) => sort === 'likes' ? (b.likes || 0) - (a.likes || 0) : sort === 'dislikes' ? (b.dislikes || 0) - (a.dislikes || 0) : String(b.createdAt).localeCompare(String(a.createdAt)));
+  $('shCount').textContent = list.length + ' cards';
+  $('shlist').innerHTML = list.length ? list.map(s => {
+    const blocked = !!users.find(u => u.uid === s.uid && u.blocked);
+    return `<div class="item">
+    <img src="${esc(String(s.image).replace('/upload/', '/upload/f_auto,q_auto,w_160/'))}" alt="">
+    <div class="meta"><b>${esc(s.name)}</b><small>${fmt(s.createdAt)} · ${s.likes || 0} likes · ${s.dislikes || 0} dislikes</small><br>
+      <span class="pill ${s.status === 'published' ? 'g' : 'y'}">${esc(s.status)}</span>${blocked ? '<span class="pill r">uploader blocked</span>' : ''}</div>
+    <div class="acts"><a class="btn ghost sm" href="${esc(s.image)}" target="_blank" rel="noopener" style="text-decoration:none">View</a>
+      <button class="btn ghost sm" data-a="hide" data-id="${s.id}">${s.status === 'published' ? 'Hide' : 'Show'}</button>
+      ${s.uid ? `<button class="btn ghost sm" data-a="blk" data-id="${s.id}">${blocked ? 'Unblock uploader' : 'Block uploader'}</button><button class="btn red sm" data-a="delall" data-id="${s.id}">Delete all by uploader</button>` : ''}
+      <button class="btn red sm" data-a="del" data-id="${s.id}">Delete</button></div></div>`;
+  }).join('') : '<div class="empty">No shayari found.</div>';
+}
+$('shSearch').oninput = renderShay; $('shSort').onchange = $('shFilter').onchange = renderShay;
+$('shlist').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return; const s = shay.find(x => x.id === b.dataset.id); if (!s) return;
+  const a = b.dataset.a;
+  if (a === 'hide') return run(async () => { await updateDoc(doc(db, 'shayari', s.id), { status: s.status === 'published' ? 'hidden' : 'published' }); await loadShayari(); }, s.status === 'published' ? 'Hidden' : 'Now live');
+  if (a === 'del') { if (!confirm('Delete this card by ' + s.name + '?')) return; return run(async () => { await deleteDoc(doc(db, 'shayari', s.id)); await loadShayari(); }, 'Deleted'); }
+  if (a === 'blk') {
+    const nb = !users.find(u => u.uid === s.uid && u.blocked);
+    if (nb && !confirm('Block this uploader (' + s.name + ')? They will no longer be able to post new cards.')) return;
+    return run(async () => { await setDoc(doc(db, 'users', s.uid), { blocked: nb }, { merge: true }); await loadUsers(); renderShay(); }, nb ? 'Uploader blocked' : 'Uploader unblocked');
+  }
+  if (a === 'delall') {
+    const mine = shay.filter(x => x.uid === s.uid);
+    if (!confirm('Delete all ' + mine.length + ' card(s) by this uploader (' + s.name + ')?')) return;
+    return run(async () => { await Promise.all(mine.map(x => deleteDoc(doc(db, 'shayari', x.id)))); await loadShayari(); }, 'Deleted ' + mine.length + ' card(s)');
+  }
+};
+</script>
+<script>
+(() => {
+  const b = document.getElementById('menuBtn'); let down = false, moved = 0, ox = 0, oy = 0, sx = 0, sy = 0;
+  b.addEventListener('pointerdown', e => { down = true; moved = 0; sx = e.clientX; sy = e.clientY; ox = e.clientX - b.offsetLeft; oy = e.clientY - b.offsetTop; b.setPointerCapture(e.pointerId); b.style.cursor = 'grabbing' });
+  b.addEventListener('pointermove', e => { if (!down) return; moved = Math.max(moved, Math.hypot(e.clientX - sx, e.clientY - sy)); if (moved < 6) return;
+    b.style.left = Math.max(10, Math.min(innerWidth - 65, e.clientX - ox)) + 'px'; b.style.top = Math.max(10, Math.min(innerHeight - 65, e.clientY - oy)) + 'px';
+    const m = document.getElementById('gfyDrawer'); if (m) { m.style.left = b.style.left; m.style.top = (parseFloat(b.style.top) + 60) + 'px' } });
+  b.addEventListener('pointerup', () => { down = false; b.style.cursor = 'grab'; if (moved < 6 && window.openDrawer) window.openDrawer(b) });
+})();
+</script>
+</body>
+</html>
