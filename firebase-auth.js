@@ -1,16 +1,15 @@
 // Firebase Auth shim — replaces Netlify Identity. Exposes window.gfyAuth { open, close, on, init, logout }.
-import { initializeApp } from "https://gstatic.com";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
   getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
   sendEmailVerification, sendPasswordResetEmail, updateProfile, signOut,
   GoogleAuthProvider, signInWithPopup, signInAnonymously
-} from "https://gstatic.com";
-import { getFirestore, doc, setDoc } from "https://gstatic.com";
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCamlYyzAU79TS-xHxtrC8Pj41KnlxzLio",
-  // Updated exactly to your domain growforyou.in
-  authDomain: "growforyou.in", 
+  authDomain: "growforyou.in",
   projectId: "good-for-you-b4438",
   storageBucket: "good-for-you-b4438.firebasestorage.app",
   messagingSenderId: "186560832330",
