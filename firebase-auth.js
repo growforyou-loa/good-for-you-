@@ -9,7 +9,7 @@ import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10
 
 const firebaseConfig = {
   apiKey: "AIzaSyCamlYyzAU79TS-xHxtrC8Pj41KnlxzLio",
-  authDomain: "growforyou.in",
+  authDomain: "login.growforyou.in",
   projectId: "good-for-you-b4438",
   storageBucket: "good-for-you-b4438.firebasestorage.app",
   messagingSenderId: "186560832330",
