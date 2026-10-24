@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shayari Wall — Good for You</title>
+<meta name="description" content="Read, like and share shayari and poems from our community. Design your own card and post it on the Good for You Shayari Wall.">
+<meta name="theme-color" content="#0b1120">
+<link rel="icon" href="/favicon.ico">
+<link rel="canonical" href="https://growforyou.in/shayari">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<script type="module" src="/firebase-auth.js"></script>
+<script type="module" src="/history.js"></script>
+<script src="/drawer.js" defer></script>
+<style>
+:root{--primary:#6366f1;--secondary:#22d3ee;--text:#e5e7eb;--mut:#8b8fa8;--line:rgba(255,255,255,.1);--card:rgba(255,255,255,.05);--ok:#4ade80;--bad:#f87171}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{min-height:100vh;color:var(--text);background:#030712;overflow-x:hidden;position:relative}
+.bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:orbFloat ease-in-out infinite}
+.bg-orb-1{width:600px;height:600px;background:#6366f1;top:-10%;left:-10%;animation-duration:18s}
+.bg-orb-2{width:500px;height:500px;background:#22d3ee;top:30%;right:-10%;animation-duration:22s;animation-delay:-8s}
+.bg-orb-3{width:400px;height:400px;background:#a78bfa;bottom:10%;left:20%;animation-duration:15s;animation-delay:-4s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.05)}66%{transform:translate(-20px,40px) scale(.95)}}
+.menu-btn{position:fixed;top:24px;left:20px;width:52px;height:52px;border-radius:16px;border:1px solid rgba(255,255,255,.1);background:rgba(10,15,30,.85);backdrop-filter:blur(16px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:grab;z-index:4000;touch-action:none;transition:border-color .3s}
+.menu-btn:hover{border-color:rgba(34,211,238,.4)}
+.menu-btn span{height:1.5px;width:22px;background:#e5e7eb;border-radius:2px}
+.hero,.tools,main{position:relative;z-index:1}
+svg{display:block}
+.hero{max-width:760px;margin:0 auto;padding:92px 18px 10px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border-radius:999px;border:1px solid rgba(34,211,238,.35);color:var(--secondary);background:rgba(34,211,238,.08)}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--secondary);box-shadow:0 0 10px var(--secondary)}
+h1{font-family:'Tiro Devanagari Hindi','Poppins',serif;font-weight:400;font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.2;margin:16px 0 6px;background:linear-gradient(90deg,#a5b4fc,#22d3ee 55%,#86efac);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);font-size:.92rem;line-height:1.6;max-width:520px;margin:0 auto 22px}
+.search{position:relative;max-width:520px;margin:0 auto}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:19px;height:19px;stroke:var(--mut);fill:none;stroke-width:2;stroke-linecap:round;pointer-events:none}
+.search input{width:100%;padding:15px 44px 15px 46px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;outline:none;transition:.2s}
+.search input::placeholder{color:#7b7e96}
+.search input:focus{border-color:var(--primary);background:rgba(99,102,241,.08);box-shadow:0 0 0 4px rgba(99,102,241,.18)}
+.search button{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:#ddd;cursor:pointer;display:none;align-items:center;justify-content:center}
+.search button.on{display:flex}
+.search button svg{position:static;transform:none;width:14px;height:14px;stroke:#ddd}
+.tools{max-width:1180px;margin:22px auto 0;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pills{display:flex;gap:8px}
+.pills button{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:.8rem;cursor:pointer;transition:.2s}
+.pills button.on{background:linear-gradient(135deg,#6366f1,#22d3ee);border-color:transparent;font-weight:600}
+#count{font-size:.78rem;color:var(--mut)}
+main{max-width:1180px;margin:0 auto;padding:16px 18px 130px}
+#grid{column-width:250px;column-gap:16px}
+.card{break-inside:avoid;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:transform .25s,border-color .25s;animation:up .45s ease both}
+.card:hover{transform:translateY(-4px);border-color:rgba(99,102,241,.4)}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card .pic{display:block;width:100%;background:#0e1426;cursor:zoom-in;border:0;padding:0}
+.card img{display:block;width:100%;height:auto}
+.meta{display:flex;align-items:center;gap:10px;padding:12px 14px 6px}
+.av{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:#fff;background:linear-gradient(135deg,#6366f1,#22d3ee);overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
+.who{min-width:0}
+.who b{display:block;font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who small{color:var(--mut);font-size:.72rem}
+.acts{display:flex;gap:8px;padding:6px 14px 14px}
+.vote{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:.8rem;cursor:pointer;transition:.18s}
+.vote svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.vote:hover{background:rgba(255,255,255,.1)}
+.vote.like.on{background:rgba(74,222,128,.16);border-color:rgba(74,222,128,.5);color:var(--ok)}
+.vote.like.on svg{fill:currentColor}
+.vote.dis.on{background:rgba(248,113,113,.16);border-color:rgba(248,113,113,.5);color:var(--bad)}
+.vote.dis.on svg{fill:currentColor}
+.vote:active{transform:scale(.94)}
+/* ─── Loading skeletons ─── */
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+.shimmer,.card .pic.ld-wait{background:linear-gradient(100deg,rgba(255,255,255,.05) 30%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.05) 70%);background-size:200% 100%;animation:shimmer 1.4s linear infinite}
+.sk{break-inside:avoid;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.sk-pic{width:100%}
+.sk-meta{display:flex;align-items:center;gap:10px;padding:12px 14px 4px}
+.sk-av{flex:none;width:34px;height:34px;border-radius:50%}
+.sk-lines{flex:1}.sk-line{height:9px;border-radius:6px;width:60%}.sk-line.s{width:34%;margin-top:7px}
+.sk-acts{display:flex;gap:8px;padding:8px 14px 14px}.sk-btn{height:34px;width:62px;border-radius:999px}
+.card .pic img{opacity:0;transition:opacity .4s ease}.card .pic img.ld{opacity:1}
+@media (prefers-reduced-motion:reduce){.shimmer,.card .pic.ld-wait{animation-duration:3s}}
+.empty{text-align:center;color:var(--mut);padding:70px 10px;font-size:.95rem;column-span:all}
+.empty svg{width:54px;height:54px;margin:0 auto 14px;stroke:var(--mut);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+.fab{position:fixed;right:18px;bottom:20px;z-index:40;display:flex;align-items:center;gap:9px;padding:15px 22px;border:0;border-radius:999px;background:linear-gradient(135deg,#6366f1,#22d3ee);color:#fff;font-weight:600;font-size:.95rem;cursor:pointer;box-shadow:0 12px 34px rgba(99,102,241,.5);transition:.2s}
+.fab:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(99,102,241,.6)}
+.fab svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%) translateY(20px);background:#111a30;border:1px solid var(--line);color:#fff;padding:11px 18px;border-radius:12px;font-size:.85rem;opacity:0;pointer-events:none;transition:.3s;z-index:200;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+/* lightbox */
+#lb{position:fixed;inset:0;z-index:150;background:rgba(3,6,15,.92);display:none;align-items:center;justify-content:center;padding:18px;flex-direction:column;gap:14px}
+#lb.on{display:flex}
+#lb img{max-width:100%;max-height:78vh;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#lb .bar{display:flex;gap:10px}
+.ibtn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.08);color:#fff;font-size:.85rem;cursor:pointer;text-decoration:none}
+.ibtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ibtn:hover{background:rgba(255,255,255,.16)}
+
+/* ───────── STUDIO ───────── */
+#studio{position:fixed;inset:0;z-index:100;background:#080d1c;display:none;flex-direction:column}
+#studio.on{display:flex}
+.sbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:#0b1124}
+.sbar h2{flex:1;font-size:1rem;font-weight:600}
+.sbar .ic{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sbar .ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sbar .ic:disabled{opacity:.35}
+.post{padding:10px 20px;border:0;border-radius:11px;background:linear-gradient(135deg,#6366f1,#22d3ee);color:#fff;font-weight:600;font-size:.88rem;cursor:pointer}
+.post:disabled{opacity:.6;cursor:wait}
+.sbody{flex:1;min-height:0;display:flex;flex-direction:column}
+@media(min-width:900px){.sbody{flex-direction:row}}
+.stage{flex:none;display:flex;align-items:center;justify-content:center;padding:12px;background:#0a0f20;height:44vh}
+@media(min-width:900px){.stage{flex:1;height:auto}}
+#cv{max-width:100%;max-height:100%;width:auto;height:auto;box-shadow:0 10px 40px rgba(0,0,0,.6);touch-action:none;border-radius:4px}
+.panel{flex:1;min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--line);background:#0b1124}
+@media(min-width:900px){.panel{flex:none;width:410px;border-top:0;border-left:1px solid var(--line)}}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.tabs button{padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:.8rem;cursor:pointer}
+.tabs button.on{background:linear-gradient(135deg,#6366f1,#22d3ee);border-color:transparent;font-weight:600}
+.pn{display:none;flex:1;overflow:auto;padding:14px;gap:12px;align-content:start}
+.pn.on{display:grid}
+.pn label{display:grid;gap:5px;font-size:.76rem;color:var(--mut)}
+.pn input[type=text],.pn textarea,.pn select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;font-size:.9rem;outline:none}
+.pn select option,.pn select optgroup{background:#0b1124;color:#fff}
+.pn textarea{min-height:120px;resize:vertical;line-height:1.6}
+.pn input:focus,.pn textarea:focus,.pn select:focus{border-color:var(--primary)}
+.pn input[type=color]{width:100%;height:40px;padding:2px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06)}
+.pn input[type=range]{width:100%;accent-color:#6366f1}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:.8rem}
+.chk label{display:flex;align-items:center;gap:6px;color:var(--text)}
+.hint{font-size:.76rem;color:var(--mut);line-height:1.5}
+.pn h3{font-size:.76rem;font-weight:600;color:var(--secondary);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.07);color:#fff;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn:hover{background:rgba(255,255,255,.14)}
+.btn.main{background:linear-gradient(135deg,#6366f1,#22d3ee);border-color:transparent;font-weight:600}
+.btn.red{color:var(--bad);border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.1)}
+.b4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.b4 .btn{padding:9px 2px;font-size:.74rem}
+.shapes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.shapes button{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff}
+.shapes button:hover{background:rgba(99,102,241,.25)}
+.shapes svg{width:26px;height:26px;fill:currentColor;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
+.themes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.themes button{aspect-ratio:1;border-radius:12px;border:2px solid transparent;cursor:pointer;display:flex;align-items:flex-end;justify-content:center;padding:0;overflow:hidden}
+.themes button span{display:block;width:100%;font-size:.58rem;padding:2px 0;background:rgba(0,0,0,.55);color:#fff}
+.themes button.on{border-color:#fff}
+.left{flex:none;display:flex;flex-direction:column;min-height:0}
+@media(min-width:900px){.left{flex:1}.left .stage{flex:1;height:auto}}
+#qbar{display:none;gap:6px;padding:8px 12px;background:#0b1124;border-top:1px solid var(--line);overflow-x:auto}
+#qbar.on{display:flex}
+#qbar button{flex:none;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#fff;font-size:.78rem;cursor:pointer;white-space:nowrap}
+#qbar button.red{color:var(--bad);border-color:rgba(248,113,113,.35)}
+.sws{display:flex;gap:7px;flex-wrap:wrap}
+.sws button{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;padding:0}
+.syms{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.syms button{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;font-size:1.25rem;cursor:pointer;padding:0}
+.syms button:hover{background:rgba(99,102,241,.25)}
+#stk{min-height:54px;padding:12px;border-radius:12px;border:1px dashed rgba(34,211,238,.5);background:rgba(34,211,238,.05);color:#fff;font-size:1.3rem;outline:none}
+#stk:empty:before{content:attr(data-ph);color:var(--mut);font-size:.82rem}
+#stk img{max-width:60px}
+#layers{display:grid;gap:6px}
+.lyr{text-align:left;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--text);font-size:.8rem;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lyr.on{border-color:var(--secondary);background:rgba(34,211,238,.1)}
+#up{position:absolute;inset:0;z-index:5;background:rgba(5,9,20,.82);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;font-size:.95rem}
+#up.on{display:flex}
+#up .bar{width:min(300px,70vw);height:6px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+#up .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#6366f1,#22d3ee);transition:width .2s}
+.msg{font-size:.82rem;color:var(--bad);min-height:1.1em}
+</style>
+</head>
+<body>
+
+<!-- BG -->
+<div class="bg-canvas" aria-hidden="true"><div class="bg-orb bg-orb-1"></div><div class="bg-orb bg-orb-2"></div><div class="bg-orb bg-orb-3"></div></div>
+
+<!-- Floating menu (content comes from /drawer.js) -->
+<button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+
+<section class="hero">
+  <span class="badge"><i></i> Weekend Literature Fair</span>
+  <h1>शायरी महफ़िल</h1>
+  <p class="sub">Every voice is welcome. Read verses from our community, like your favourites, and post your own beautifully designed card.</p>
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input id="q" type="search" placeholder="Search by uploader name…" aria-label="Search by uploader name" autocomplete="off">
+    <button id="qx" aria-label="Clear search"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+</section>
+
+<div class="tools">
+  <div class="pills" id="sort"><button data-s="new" class="on">Newest</button><button data-s="top">Most liked</button></div>
+  <span id="count"></span>
+</div>
+
+<main><div id="grid" aria-busy="true"><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.8"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:1"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.7"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.95"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.75"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:1.1"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div></div></main>
+
+<button class="fab" id="upBtn" aria-label="Upload your shayari">
+  <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Upload yours
+</button>
+<div id="toast" role="status"></div>
+
+<!-- Lightbox -->
+<div id="lb" role="dialog" aria-modal="true">
+  <img id="lbImg" alt="">
+  <div class="bar">
+    <a class="ibtn" id="lbDl" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg> Save</a>
+    <button class="ibtn" id="lbX"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Close</button>
+  </div>
+</div>
+
+<!-- Studio -->
+<div id="studio" role="dialog" aria-modal="true" aria-label="Shayari card studio">
+  <div class="sbar">
+    <button class="ic" id="sClose" aria-label="Close studio"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <h2>Card Studio</h2>
+    <button class="ic" id="undo" aria-label="Undo"><svg viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg></button>
+    <button class="ic" id="redo" aria-label="Redo"><svg viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7L21 13"/></svg></button>
+    <button class="post" id="post">Post</button>
+  </div>
+  <div class="sbody" style="position:relative">
+    <div class="left">
+      <div class="stage"><canvas id="cv"></canvas></div>
+      <div id="qbar" aria-label="Selected item tools"><button data-q="edit">✎ Edit</button><button data-q="dup">⧉ Copy</button><button data-q="fw">⬆ Front</button><button data-q="bk">⬇ Back</button><button data-q="cx">⇔ Centre</button><button data-q="del" class="red">🗑 Delete</button></div>
+    </div>
+    <div class="panel">
+      <div class="tabs" id="tabs"><button data-t="write" class="on">✍️ Write</button><button data-t="add">➕ Add</button><button data-t="style">🎨 Style</button><button data-t="design">🖼️ Design</button></div>
+
+      <section class="pn on" id="write">
+        <label>Your shayari / poem<textarea id="w_tx" placeholder="यहाँ अपनी शायरी लिखिए…"></textarea></label>
+        <div class="row">
+          <label>Font<select id="w_f"></select></label>
+          <label>Text colour<input type="color" id="w_c"></label>
+        </div>
+        <div class="sws" data-for="w_c"></div>
+        <div class="row">
+          <label>Your name (shown on card)<input type="text" id="w_name" maxlength="40" placeholder="Name"></label>
+          <label>Name font<select id="n_f"></select></label>
+        </div>
+        <div class="msg" id="wMsg"></div>
+        <p class="hint">Tip: drag items to move them, use two fingers to resize and rotate. Tap an item to get quick tools under the card.</p>
+      </section>
+
+      <section class="pn" id="add">
+        <button class="btn main" id="a_text"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg> Add text box</button>
+        <h3>Photo · picture-in-picture</h3>
+        <div class="row"><button class="btn" id="a_photo">🖼️ Photo on card</button><button class="btn" id="a_bgphoto">🌄 As background</button></div>
+        <input type="file" id="fPhoto" accept="image/*" hidden>
+        <p class="hint">Photos can be moved, resized, rotated, rounded or circle-cropped in the Style tab.</p>
+        <h3>Keyboard stickers &amp; emoji</h3>
+        <div id="stk" contenteditable="true" role="textbox" aria-label="Sticker pad" data-ph="Tap here, then send a sticker, GIF or emoji from your keyboard…"></div>
+        <p class="hint">Open your keyboard’s sticker / GIF / emoji tab and send one — it lands on your card. You can also paste an image, or drop one on the card.</p>
+        <h3>Symbols &amp; emoji</h3>
+        <div class="syms" id="syms"></div>
+        <h3>Decorations</h3>
+        <div class="shapes" id="shapes"></div>
+        <p class="hint">Added items can be moved, resized, rotated and recoloured in the Style tab.</p>
+      </section>
+
+      <section class="pn" id="style">
+        <p class="hint" id="noSel">Tap anything on the card to edit it.</p>
+        <div id="sty" style="display:grid;gap:12px">
+          <label data-t="text">Text<textarea id="s_tx" style="min-height:80px"></textarea></label>
+          <div class="row" data-t="text"><label>Font<select id="s_f"></select></label><label>Colour<input type="color" id="s_c"></label></div>
+          <div class="sws" data-t="text" data-for="s_c"></div>
+          <label>Size<input type="range" id="s_sz"></label>
+          <label data-t="text">Text box width<input type="range" id="s_w" min="100" max="1100"></label>
+          <div class="row" data-t="text">
+            <label>Align<select id="s_al"><option>left</option><option>center</option><option>right</option></select></label>
+            <div class="chk"><label><input type="checkbox" id="s_b">Bold</label><label><input type="checkbox" id="s_i">Italic</label><label><input type="checkbox" id="s_sh">Shadow</label></div>
+          </div>
+          <label data-t="text">Line spacing<input type="range" id="s_lh" min="0.8" max="2.2" step="0.05"></label>
+          <div class="row" data-t="img"><label>Corners<select id="s_cr"><option value="">Square</option><option value="round">Rounded</option><option value="circle">Circle / oval</option></select></label><div class="chk"><label><input type="checkbox" id="s_fl">Flip</label><label><input type="checkbox" id="s_sh2">Shadow</label></div></div>
+          <div class="row" data-t="text shape img"><label>Outline / border colour<input type="color" id="s_sc"></label><label>Outline width<input type="range" id="s_sw" min="0" max="30"></label></div>
+          <label data-t="shape">Fill colour<input type="color" id="s_fill"></label>
+          <div class="sws" data-t="shape" data-for="s_fill"></div>
+          <label>Opacity<input type="range" id="s_op" min="0.1" max="1" step="0.05"></label>
+          <div class="b4"><button class="btn" id="b_fw">Forward</button><button class="btn" id="b_bk">Back</button><button class="btn" id="b_dup">Copy</button><button class="btn red" id="b_del">Delete</button></div>
+        </div>
+        <h3>Layers <small style="text-transform:none;letter-spacing:0;color:var(--mut)">(tap to select)</small></h3><div id="layers"></div>
+      </section>
+
+      <section class="pn" id="design">
+        <h3>Themes</h3><div class="themes" id="themes"></div>
+        <label>Card shape<select id="p_fmt"><option value="p">Portrait 4:5</option><option value="s">Square</option><option value="t">Tall 9:16</option></select></label>
+        <h3>Background</h3>
+        <div class="row"><label>Type<select id="p_bk"><option value="solid">Solid</option><option value="lin">Linear gradient</option><option value="rad">Radial gradient</option><option value="img">Photo</option></select></label><label>Angle<input type="range" id="p_ang" min="0" max="360"></label></div>
+        <div class="row"><label>Colour 1<input type="color" id="p_a"></label><label>Colour 2<input type="color" id="p_b"></label></div>
+        <div class="row"><button class="btn" id="p_bgpick">🌄 Choose background photo</button><label>Darken photo<input type="range" id="p_dim" min="0" max="0.85" step="0.05"></label></div>
+        <h3>Pattern</h3>
+        <div class="row"><label>Type<select id="p_pk"><option value="none">None</option><option value="dots">Dots</option><option value="stripes">Stripes</option><option value="grid">Grid</option><option value="lines">Ruled lines</option></select></label><label>Colour<input type="color" id="p_pc"></label></div>
+        <label>Strength<input type="range" id="p_po" min="0.02" max="0.5" step="0.02"></label>
+        <h3>Border</h3>
+        <div class="row"><label>Style<select id="p_fk"><option value="none">None</option><option value="thin">Thin</option><option value="thick">Thick</option><option value="double">Double</option><option value="corners">Corner marks</option></select></label><label>Colour<input type="color" id="p_fc"></label></div>
+        <button class="btn" id="p_reset">Reset text layout</button>
+      </section>
+    </div>
+    <div id="up"><span id="upTxt">Posting…</span><div class="bar"><i id="upBar"></i></div></div>
+  </div>
+</div>
+
+<script type="module">
+import { collection, query, where, limit, getDocs, addDoc, doc, writeBatch, increment }
+  from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* ─── CONFIG ─── */
+const CLOUD_NAME = 'a7z3drop', UPLOAD_PRESET = 'gfy-umsigned';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast = (t) => { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2800); };
+const goLogin = () => { location.href = '/login.html?next=' + encodeURIComponent('/shayari.html'); };
+
+const IC = {
+  up: '<svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>',
+  down: '<svg viewBox="0 0 24 24"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>',
+  feather: '<svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><path d="M16 8L2 22M17.5 15H9"/></svg>'
+};
+
+/* ─── Floating menu (draggable; opens /drawer.js drawer) ─── */
+(() => {
+  const b = $('menuBtn'); let down = false, moved = 0, ox = 0, oy = 0, sx = 0, sy = 0;
+  b.addEventListener('pointerdown', e => { down = true; moved = 0; sx = e.clientX; sy = e.clientY; ox = e.clientX - b.offsetLeft; oy = e.clientY - b.offsetTop; b.setPointerCapture(e.pointerId); b.style.cursor = 'grabbing' });
+  b.addEventListener('pointermove', e => { if (!down) return; moved = Math.max(moved, Math.hypot(e.clientX - sx, e.clientY - sy)); if (moved < 6) return;
+    b.style.left = Math.max(10, Math.min(innerWidth - 65, e.clientX - ox)) + 'px'; b.style.top = Math.max(10, Math.min(innerHeight - 65, e.clientY - oy)) + 'px' });
+  b.addEventListener('pointerup', () => { down = false; b.style.cursor = 'grab'; if (moved < 6 && window.openDrawer) window.openDrawer(b) });
+})();
+
+/* ─── Auth (anonymous by default; Google/email accounts still work) ─── */
+let me = null, myVotes = {};
+function ready(fn) { window.gfyAuth ? fn() : setTimeout(() => ready(fn), 50); }
+let authDone; const authReady = new Promise(r => authDone = r);
+ready(() => {
+  gfyAuth.on('init', async u => {
+    if (!u) { try { await gfyAuth.anon(); } catch (e) { console.warn('Anonymous sign-in failed', e); } }
+    me = gfyAuth.currentUser(); authDone(me); loadVotes();
+  });
+  gfyAuth.on('login', u => { me = u; loadVotes(); });
+  gfyAuth.init();
+});
+async function loadVotes() {
+  if (!me) return; myVotes = {};
+  try {
+    const snap = await getDocs(query(collection(gfyAuth.db, 'shayariVotes'), where('uid', '==', me.uid)));
+    snap.forEach(d => { const v = d.data(); myVotes[v.sid] = v.v; });
+    paintAll();
+  } catch (e) { console.warn(e); }
+}
+
+/* ─── Feed ─── */
+let items = [], sortMode = 'new', term = '';
+const SKEL = `<div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.8"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:1"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.7"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.95"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:0.75"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div><div class="sk" aria-hidden="true"><div class="sk-pic shimmer" style="aspect-ratio:1.1"></div><div class="sk-meta"><div class="sk-av shimmer"></div><div class="sk-lines"><div class="sk-line shimmer"></div><div class="sk-line s shimmer"></div></div></div><div class="sk-acts"><div class="sk-btn shimmer"></div><div class="sk-btn shimmer"></div></div></div>`;
+async function loadFeed() {
+  $('grid').setAttribute('aria-busy', 'true'); $('grid').innerHTML = SKEL; $('count').textContent = 'Loading…';
+  ready(async () => {
+    try {
+      const snap = await getDocs(query(collection(gfyAuth.db, 'shayari'), where('status', '==', 'published'), limit(500)));
+      items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderFeed();
+    } catch (e) { $('grid').removeAttribute('aria-busy'); $('count').textContent = ''; $('grid').innerHTML = '<div class="empty">Couldn\'t load the wall right now. Please refresh.</div>'; console.warn(e); }
+  });
+}
+const ago = iso => { const s = (Date.now() - new Date(iso)) / 1000; if (isNaN(s)) return ''; if (s < 60) return 'just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago'; if (s < 86400) return Math.floor(s / 3600) + ' h ago'; return Math.floor(s / 86400) + ' d ago'; };
+const safePhoto = u => /^https:\/\//.test(u || '') ? u : '';
+const avatarHTML = i => { const ini = esc((i.name || '?').trim().charAt(0).toUpperCase()), p = safePhoto(i.photo);
+  return p ? `<div class="av"><img src="${esc(p)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.textContent='${ini}'"></div>` : `<div class="av">${ini}</div>`; };
+const thumb = (u, w) => String(u).replace('/upload/', '/upload/f_auto,q_auto,w_' + w + '/');
+function renderFeed() {
+  const t = term.trim().toLowerCase();
+  let list = items.filter(i => !t || (i.name || '').toLowerCase().includes(t));
+  list.sort(sortMode === 'top' ? (a, b) => ((b.likes || 0) - (b.dislikes || 0)) - ((a.likes || 0) - (a.dislikes || 0)) : (a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  $('grid').removeAttribute('aria-busy');
+  $('count').textContent = list.length + (list.length === 1 ? ' card' : ' cards');
+  if (!list.length) { $('grid').innerHTML = `<div class="empty">${IC.feather}${t ? 'No uploader found with that name.' : 'No shayari yet — be the first to post one!'}</div>`; return; }
+  $('grid').innerHTML = list.map((i, n) => `<article class="card" data-id="${i.id}" style="animation-delay:${Math.min(n, 12) * 40}ms">
+    <button class="pic ld-wait" data-a="open" aria-label="Open card by ${esc(i.name)}"><img onload="this.classList.add('ld');this.parentNode.classList.remove('ld-wait')" onerror="this.classList.add('ld');this.parentNode.classList.remove('ld-wait')" src="${esc(thumb(i.image, 640))}" alt="Shayari by ${esc(i.name)}" loading="lazy" style="aspect-ratio:${i.ar || 0.8}"></button>
+    <div class="meta">${avatarHTML(i)}<div class="who"><b>${esc(i.name)}</b><small>${ago(i.createdAt)}</small></div></div>
+    <div class="acts">
+      <button class="vote like" data-a="like" aria-label="Like">${IC.up}<span>${i.likes || 0}</span></button>
+      <button class="vote dis" data-a="dis" aria-label="Dislike">${IC.down}<span>${i.dislikes || 0}</span></button>
+    </div></article>`).join('');
+  paintAll();
+}
+function paintAll() {
+  document.querySelectorAll('.card').forEach(c => {
+    const i = items.find(x => x.id === c.dataset.id); if (!i) return;
+    const v = myVotes[i.id] || 0;
+    c.querySelector('.like').classList.toggle('on', v === 1);
+    c.querySelector('.dis').classList.toggle('on', v === -1);
+    c.querySelector('.like span').textContent = i.likes || 0;
+    c.querySelector('.dis span').textContent = i.dislikes || 0;
+  });
+}
+$('grid').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-a]'); if (!b) return;
+  const card = b.closest('.card'), it = items.find(x => x.id === card.dataset.id); if (!it) return;
+  if (b.dataset.a === 'open') { $('lbImg').src = thumb(it.image, 1080); $('lbDl').href = it.image.replace('/upload/', '/upload/fl_attachment/'); $('lb').classList.add('on'); window.gfyHist && gfyHist.add({ k: 'shayari', id: it.id, title: (it.name || '') + '\u2019s shayari', img: thumb(it.image, 300), url: '/shayari.html' }); return; }
+  await authReady; if (!me) return toast('Couldn\'t connect. Refresh the page and try again.');
+  const want = b.dataset.a === 'like' ? 1 : -1, prev = myVotes[it.id] || 0, next = prev === want ? 0 : want;
+  const dl = (next === 1 ? 1 : 0) - (prev === 1 ? 1 : 0), dd = (next === -1 ? 1 : 0) - (prev === -1 ? 1 : 0);
+  it.likes = (it.likes || 0) + dl; it.dislikes = (it.dislikes || 0) + dd; myVotes[it.id] = next; paintAll();
+  try {
+    const db = gfyAuth.db, batch = writeBatch(db), vref = doc(db, 'shayariVotes', me.uid + '_' + it.id);
+    if (next === 0) batch.delete(vref); else batch.set(vref, { uid: me.uid, sid: it.id, v: next });
+    batch.update(doc(db, 'shayari', it.id), { likes: increment(dl), dislikes: increment(dd) });
+    await batch.commit();
+  } catch (err) { it.likes -= dl; it.dislikes -= dd; myVotes[it.id] = prev; paintAll(); toast('Couldn\'t save your vote. Try again.'); }
+});
+$('lbX').onclick = () => $('lb').classList.remove('on');
+$('lb').onclick = e => { if (e.target === $('lb')) $('lb').classList.remove('on'); };
+$('q').oninput = e => { term = e.target.value; $('qx').classList.toggle('on', !!term); renderFeed(); };
+$('qx').onclick = () => { $('q').value = ''; term = ''; $('qx').classList.remove('on'); renderFeed(); $('q').focus(); };
+$('sort').onclick = e => { const s = e.target.dataset.s; if (!s) return; sortMode = s; document.querySelectorAll('#sort button').forEach(b => b.classList.toggle('on', b.dataset.s === s)); renderFeed(); };
+loadFeed();
+
+/* ═══════════════════════════════════════
+   STUDIO
+═══════════════════════════════════════ */
+const FONTS = [
+  ['Devanagari · हिन्दी', [['Tiro Devanagari Hindi', 'dv'], ['Noto Serif Devanagari', 'dv'], ['Yatra One', 'dv'], ['Rozha One', 'dv'], ['Kalam', 'dv'], ['Hind', 'dv'], ['Mukta', 'dv'], ['Amita', 'dv'], ['Sahitya', 'dv'], ['Eczar', 'dv'], ['Khand', 'dv'], ['Laila', 'dv'], ['Baloo 2', 'dv'], ['Karma', 'dv'], ['Arya', 'dv'], ['Palanquin Dark', 'dv'], ['Sura', 'dv'], ['Martel', 'dv'], ['Halant', 'dv'], ['Vesper Libre', 'dv'], ['Modak', 'dv']]],
+  ['Urdu · اردو', [['Noto Nastaliq Urdu', 'ur'], ['Amiri', 'ur'], ['Aref Ruqaa', 'ur']]],
+  ['English', [['Playfair Display', 'en'], ['Cormorant Garamond', 'en'], ['Dancing Script', 'en'], ['Great Vibes', 'en'], ['Caveat', 'en'], ['Cinzel', 'en'], ['Pacifico', 'en'], ['Lobster', 'en'], ['Poppins', 'en']]]
+];
+const SAMPLE = { dv: 'अआकखगशायरी', ur: 'ابپتشاعری', en: 'Abcdefg' };
+const KIND = {}; FONTS.forEach(([, l]) => l.forEach(([n, k]) => KIND[n] = k));
+const LH = f => KIND[f] === 'ur' ? (f === 'Noto Nastaliq Urdu' ? 2.2 : 1.7) : 1.5;
+const lhOf = o => LH(o.f) * (o.lh || 1);
+let fontsInjected = false;
+function injectFonts() {
+  if (fontsInjected) return; fontsInjected = true;
+  Object.keys(KIND).forEach(n => { if (n === 'Poppins' || n === 'Tiro Devanagari Hindi') return;
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=' + n.replace(/ /g, '+') + '&display=swap'; document.head.appendChild(l); });
+}
+const loadFont = f => document.fonts.load('40px "' + f + '"', SAMPLE[KIND[f] || 'en']).catch(() => {});
+const loadAllFonts = () => Promise.all(Object.keys(KIND).map(loadFont));
+
+const cv = $('cv'), X = cv.getContext('2d');
+const THEMES = [
+  ['Midnight', 'lin', '#0f172a', '#312e81', 160, '#f8fafc', '#fbbf24'], ['Parchment', 'solid', '#f5ecd7', '#f5ecd7', 0, '#3b2a1a', '#9a3412'],
+  ['Rose', 'lin', '#4c0519', '#be123c', 150, '#fff1f2', '#fda4af'], ['Ocean', 'rad', '#0e7490', '#082f49', 0, '#ecfeff', '#fde047'],
+  ['Forest', 'lin', '#052e16', '#166534', 160, '#f0fdf4', '#fde68a'], ['Sunset', 'lin', '#7c2d12', '#f59e0b', 160, '#fffbeb', '#ffffff'],
+  ['Ink', 'solid', '#111111', '#111111', 0, '#fafafa', '#ef4444'], ['Lavender', 'lin', '#ede9fe', '#c4b5fd', 160, '#2e1065', '#7c3aed'],
+  ['Gold', 'lin', '#1c1917', '#78350f', 160, '#fef3c7', '#f59e0b'], ['Mint', 'lin', '#ecfdf5', '#a7f3d0', 160, '#064e3b', '#059669']
+];
+const SHAPES = [
+  ['orn', 'Divider', '<path d="M2 12h8M14 12h8" /><path d="M12 8l4 4-4 4-4-4z"/>'],
+  ['line', 'Line', '<path d="M3 12h18" stroke-width="3"/>'],
+  ['circle', 'Circle', '<circle cx="12" cy="12" r="8"/>'],
+  ['ring', 'Ring', '<circle cx="12" cy="12" r="8" fill="none" stroke-width="2.5"/>'],
+  ['star', 'Star', '<path d="M12 2l3 7 7 .6-5.3 4.7 1.7 7.2-6.4-4-6.4 4 1.7-7.2L2 9.6 9 9z"/>'],
+  ['heart', 'Heart', '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>'],
+  ['diamond', 'Diamond', '<path d="M12 2l8 10-8 10L4 12z"/>'],
+  ['burst', 'Burst', '<path d="M12 1l2.2 4.6 5-1-1 5 4.8 2.4-4.8 2.4 1 5-5-1L12 23l-2.2-4.6-5 1 1-5L1 12l4.8-2.4-1-5 5 1z"/>']
+];
+const DEFAULT_TX = 'यहाँ अपनी शायरी लिखिए\nदिल की हर बात कहिए';
+const SC = [['s_tx', 'tx'], ['s_f', 'f'], ['s_c', 'c'], ['s_w', 'w'], ['s_al', 'al'], ['s_b', 'b'], ['s_i', 'i'], ['s_sh', 'sh'], ['s_sc', 'sc'], ['s_sw', 'sw'], ['s_fill', 'fill'], ['s_op', 'op'], ['s_lh', 'lh'], ['s_cr', 'cr'], ['s_fl', 'fl'], ['s_sh2', 'sh']];
+let S, sel = null, hist = [], hp = -1, nid = 1, drag = null, gd = {}, built = false;
+const IMGS = {}; let iid = 1, photoMode = 'layer'; const ptrs = new Map(); let gest = null;
+
+const mk = (role, o) => Object.assign({ id: nid++, role, t: 'text', f: 'Tiro Devanagari Hindi', sz: 40, c: '#f8fafc', b: 0, i: 0, al: 'center', sc: '#000000', sw: 0, sh: 0, w: 800, x: 0, y: 0, r: 0, op: 1 }, o);
+const SZ = { p: [1080, 1350], s: [1080, 1080], t: [1080, 1920] };
+function init(fmt = 'p') {
+  const th = THEMES[0], [W, H] = SZ[fmt];
+  S = { W, H, bg: { k: th[1], a: th[2], b: th[3], ang: th[4] }, pat: { k: 'none', c: '#ffffff', o: .1 }, fr: { k: 'thin', c: th[6] }, o: [
+    mk('quote', { tx: '“', f: 'Playfair Display', sz: 260, c: th[6], op: .55, w: 300 }),
+    mk('main', { tx: DEFAULT_TX, sz: 72, c: th[5] }),
+    { id: nid++, role: 'orn', t: 'shape', sk: 'orn', w: 360, h: 40, fill: th[6], sc: th[6], sw: 0, x: 0, y: 0, r: 0, op: 1 },
+    mk('name', { tx: '— Your name', f: 'Playfair Display', i: 1, sz: 44, c: th[6] })
+  ] };
+  layout();
+}
+const core = r => S.o.find(o => o.role === r), cur = () => S.o.find(o => o.id === sel);
+const fnt = o => (o.i ? 'italic ' : '') + (o.b ? 'bold ' : '') + o.sz + 'px "' + o.f + '",sans-serif';
+function lines(o) { X.font = fnt(o); const out = []; String(o.tx).split('\n').forEach(p => { let l = ''; p.split(' ').forEach(w => { const t = l ? l + ' ' + w : w; if (X.measureText(t).width > o.w && l) { out.push(l); l = w } else l = t }); out.push(l) }); return out }
+const dim = o => o.t === 'text' ? [o.w, lines(o).length * o.sz * lhOf(o)] : [o.w, o.h];
+function rr(a, b, w, h, r) { X.beginPath(); X.moveTo(a + r, b); X.arcTo(a + w, b, a + w, b + h, r); X.arcTo(a + w, b + h, a, b + h, r); X.arcTo(a, b + h, a, b, r); X.arcTo(a, b, a + w, b, r); X.closePath() }
+
+function fitMain() {
+  const m = core('main'); if (!m) return; const maxH = S.H - 220 * 2 - 120 + (S.H > 1500 ? 160 : 0) - (S.H < 1200 ? 0 : 0);
+  const zone = S.H * (S.H < 1200 ? .5 : .52);
+  let z = 88; m.sz = z; while (z > 26 && dim(m)[1] > zone) { z -= 2; m.sz = z }
+}
+function layout() {
+  const { W, H } = S, pad = 110, mw = W - 2 * pad, q = core('quote'), m = core('main'), orn = core('orn'), nm = core('name');
+  if (q) { q.x = W / 2; q.y = pad + 90; q.r = 0 }
+  if (m) { m.w = mw; m.x = W / 2; m.r = 0; m.al = 'center'; fitMain(); m.y = (pad + 200 + (H - pad - 230)) / 2 }
+  if (orn) { orn.x = W / 2; orn.y = H - pad - 150; orn.r = 0 }
+  if (nm) { nm.w = mw; nm.x = W / 2; nm.y = H - pad - 70; nm.r = 0; nm.al = 'center' }
+}
+
+function shape(o, w, h) {
+  const k = o.sk, P = (a, b) => [a * w / 2, b * h / 2]; X.beginPath();
+  if (k === 'orn') {
+    const d = Math.min(h, 40);
+    X.lineWidth = Math.max(2, h * .08); X.strokeStyle = o.fill; X.lineCap = 'round';
+    X.moveTo(-w / 2, 0); X.lineTo(-d * .9, 0); X.moveTo(d * .9, 0); X.lineTo(w / 2, 0); X.stroke();
+    X.beginPath(); X.moveTo(0, -d / 2); X.lineTo(d / 2, 0); X.lineTo(0, d / 2); X.lineTo(-d / 2, 0); X.closePath(); X.fillStyle = o.fill; X.fill(); return;
+  }
+  if (k === 'line') X.rect(-w / 2, -h / 2, w, h);
+  else if (k === 'circle' || k === 'ring') X.ellipse(0, 0, w / 2, h / 2, 0, 0, 7);
+  else if (k === 'diamond') { X.moveTo(0, -h / 2); X.lineTo(w / 2, 0); X.lineTo(0, h / 2); X.lineTo(-w / 2, 0); X.closePath() }
+  else if (k === 'heart') { X.moveTo(...P(0, .85)); X.bezierCurveTo(...P(-1.1, .1), ...P(-.9, -.9), ...P(0, -.35)); X.bezierCurveTo(...P(.9, -.9), ...P(1.1, .1), ...P(0, .85)) }
+  else { const n = k === 'star' ? 5 : 14, ir = k === 'star' ? .42 : .82; for (let i = 0; i < 2 * n; i++) { const r = i % 2 ? ir : 1, a = i * Math.PI / n - Math.PI / 2; X[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r * w / 2, Math.sin(a) * r * h / 2) } X.closePath() }
+  if (k !== 'ring') { X.fillStyle = o.fill; X.fill() }
+  if (o.sw || k === 'ring') { X.lineWidth = k === 'ring' ? Math.max(o.sw, 6) : o.sw; X.strokeStyle = k === 'ring' ? o.fill : o.sc; X.lineJoin = 'round'; X.stroke() }
+}
+function draw(o) {
+  X.save(); X.translate(o.x, o.y); X.rotate(o.r || 0); X.globalAlpha = o.op; const [w, h] = dim(o);
+  if (o.t === 'text') {
+    X.font = fnt(o); X.textBaseline = 'top'; X.textAlign = o.al; const lx = o.al === 'left' ? -w / 2 : o.al === 'right' ? w / 2 : 0, lh = lhOf(o);
+    if (o.sh) { X.shadowColor = 'rgba(0,0,0,.45)'; X.shadowBlur = o.sz * .15; X.shadowOffsetY = o.sz * .06 }
+    lines(o).forEach((l, i) => { const y = -h / 2 + i * o.sz * lh + (lh - 1) * o.sz * .25; if (o.sw) { X.lineWidth = o.sw; X.strokeStyle = o.sc; X.lineJoin = 'round'; X.strokeText(l, lx, y) } X.fillStyle = o.c; X.fillText(l, lx, y) })
+  } else if (o.t === 'img') pic(o, w, h); else shape(o, w, h);
+  X.restore();
+}
+function pic(o, w, h) {
+  const im = IMGS[o.img]; if (!im) return;
+  const path = () => { X.beginPath(); if (o.cr === 'circle') X.ellipse(0, 0, w / 2, h / 2, 0, 0, 7); else if (o.cr === 'round') rr(-w / 2, -h / 2, w, h, Math.min(w, h) * .14); else X.rect(-w / 2, -h / 2, w, h) };
+  if (o.fl) X.scale(-1, 1);
+  if (o.sh) { X.save(); X.shadowColor = 'rgba(0,0,0,.5)'; X.shadowBlur = Math.min(w, h) * .06; X.shadowOffsetY = Math.min(w, h) * .02; path(); X.fillStyle = '#000'; X.fill(); X.restore() }
+  X.save(); path(); X.clip(); X.drawImage(im, -w / 2, -h / 2, w, h); X.restore();
+  if (o.sw) { path(); X.lineWidth = o.sw; X.strokeStyle = o.sc; X.lineJoin = 'round'; X.stroke() }
+}
+function bgdraw() {
+  const { W, H, bg: b, pat: P } = S; let f = b.a;
+  if (b.k === 'lin') { const a = b.ang * Math.PI / 180, dx = Math.sin(a), dy = -Math.cos(a), L = (Math.abs(W * dx) + Math.abs(H * dy)) / 2; f = X.createLinearGradient(W / 2 - dx * L, H / 2 - dy * L, W / 2 + dx * L, H / 2 + dy * L); f.addColorStop(0, b.a); f.addColorStop(1, b.b) }
+  else if (b.k === 'rad') { f = X.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.hypot(W, H) / 2); f.addColorStop(0, b.a); f.addColorStop(1, b.b) }
+  X.fillStyle = f; X.fillRect(0, 0, W, H);
+  if (b.k === 'img' && IMGS[b.img]) { const im = IMGS[b.img], k = Math.max(W / im.width, H / im.height), iw = im.width * k, ih = im.height * k; X.drawImage(im, (W - iw) / 2, (H - ih) / 2, iw, ih); if (b.dim) { X.fillStyle = 'rgba(0,0,0,' + b.dim + ')'; X.fillRect(0, 0, W, H) } }
+  if (P.k !== 'none') {
+    X.save(); X.globalAlpha = P.o; X.fillStyle = X.strokeStyle = P.c;
+    if (P.k === 'dots') { for (let y = 30; y < H; y += 60) for (let x = 30; x < W; x += 60) { X.beginPath(); X.arc(x, y, 5, 0, 7); X.fill() } }
+    else { X.lineWidth = P.k === 'grid' ? 3 : P.k === 'lines' ? 2 : 16; X.beginPath();
+      if (P.k === 'grid') { for (let x = 0; x < W; x += 60) { X.moveTo(x, 0); X.lineTo(x, H) } for (let y = 0; y < H; y += 60) { X.moveTo(0, y); X.lineTo(W, y) } }
+      else if (P.k === 'lines') { for (let y = 110; y < H; y += 78) { X.moveTo(0, y); X.lineTo(W, y) } }
+      else for (let i = -H; i < W; i += 64) { X.moveTo(i, 0); X.lineTo(i + H, H) }
+      X.stroke() }
+    X.restore()
+  }
+  const fr = S.fr; if (fr.k !== 'none') {
+    X.strokeStyle = fr.c; X.lineJoin = 'miter';
+    if (fr.k === 'thin') { X.lineWidth = 8; X.strokeRect(50, 50, W - 100, H - 100) }
+    else if (fr.k === 'thick') { X.lineWidth = 28; X.strokeRect(44, 44, W - 88, H - 88) }
+    else if (fr.k === 'double') { X.lineWidth = 8; X.strokeRect(42, 42, W - 84, H - 84); X.lineWidth = 3; X.strokeRect(68, 68, W - 136, H - 136) }
+    else { X.lineWidth = 8; const a = 50, L = 130; [[a, a, 1, 1], [W - a, a, -1, 1], [a, H - a, 1, -1], [W - a, H - a, -1, -1]].forEach(([x, y, sx, sy]) => { X.beginPath(); X.moveTo(x + sx * L, y); X.lineTo(x, y); X.lineTo(x, y + sy * L); X.stroke() }) }
+  }
+}
+function corner(o, lx, ly) { const c = Math.cos(o.r), s = Math.sin(o.r); return [o.x + lx * c - ly * s, o.y + lx * s + ly * c] }
+function overlay() {
+  const o = cur(); if (!o) return; const k = S.W / Math.max(cv.clientWidth, 1), [w, h] = dim(o), hd = 42 * k, hr = 13 * k;
+  X.save(); X.translate(o.x, o.y); X.rotate(o.r); X.strokeStyle = '#4f7bff'; X.fillStyle = '#fff'; X.lineWidth = 2.5 * k; X.setLineDash([8 * k, 6 * k]); X.strokeRect(-w / 2, -h / 2, w, h); X.setLineDash([]);
+  X.beginPath(); X.moveTo(0, -h / 2); X.lineTo(0, -h / 2 - hd); X.stroke();
+  [[w / 2, h / 2], [0, -h / 2 - hd]].forEach(([a, b]) => { X.beginPath(); X.arc(a, b, hr, 0, 7); X.fill(); X.stroke() }); X.restore();
+  if (gd.v || gd.h) { X.strokeStyle = '#ff2d87'; X.lineWidth = 2 * k; X.beginPath(); if (gd.v) { X.moveTo(S.W / 2, 0); X.lineTo(S.W / 2, S.H) } if (gd.h) { X.moveTo(0, S.H / 2); X.lineTo(S.W, S.H / 2) } X.stroke() }
+}
+function render(ui = true) { cv.width = S.W; cv.height = S.H; bgdraw(); S.o.forEach(draw); if (ui) overlay() }
+
+function hit(px, py) { for (let i = S.o.length - 1; i >= 0; i--) { const o = S.o[i], [w, h] = dim(o), c = Math.cos(-o.r), s = Math.sin(-o.r), dx = px - o.x, dy = py - o.y, lx = dx * c - dy * s, ly = dx * s + dy * c; if (Math.abs(lx) <= w / 2 + 8 && Math.abs(ly) <= h / 2 + 8) return o } return null }
+const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height] };
+cv.addEventListener('pointerdown', e => {
+  ptrs.set(e.pointerId, pt(e));
+  if (ptrs.size === 2 && cur()) { const [a, b] = [...ptrs.values()], o2 = cur(); gest = { o: o2, d0: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1, a0: Math.atan2(b[1] - a[1], b[0] - a[0]), s0: Object.assign({}, o2) }; drag = null; cv.setPointerCapture(e.pointerId); return }
+  if (ptrs.size > 1) return;
+  const [px, py] = pt(e), k = S.W / cv.clientWidth, o = cur(); drag = null;
+  if (o) { const [w, h] = dim(o), c = corner(o, w / 2, h / 2), ro = corner(o, 0, -h / 2 - 42 * k), hr = 26 * k;
+    if (Math.hypot(px - ro[0], py - ro[1]) < hr) drag = { m: 'rot', o }; else if (Math.hypot(px - c[0], py - c[1]) < hr) drag = { m: 'sz', o, d0: Math.hypot(px - o.x, py - o.y), s0: Object.assign({}, o) } }
+  if (!drag) { const h = hit(px, py); sel = h ? h.id : null; sync(); if (h) drag = { m: 'mv', o: h, dx: px - h.x, dy: py - h.y } }
+  if (drag) cv.setPointerCapture(e.pointerId); render();
+});
+cv.addEventListener('pointermove', e => {
+  if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, pt(e));
+  if (gest) { if (ptrs.size < 2) return; const [a, b] = [...ptrs.values()], g = gest, o = g.o, kk = Math.max(.1, Math.hypot(a[0] - b[0], a[1] - b[1]) / g.d0), s0 = g.s0;
+    if (o.t === 'text') { o.sz = s0.sz * kk; o.w = s0.w * kk } else { o.w = s0.w * kk; o.h = s0.h * kk }
+    o.r = (s0.r || 0) + Math.atan2(b[1] - a[1], b[0] - a[0]) - g.a0; render(); return }
+  if (!drag) return; const [px, py] = pt(e), o = drag.o, H2 = Math.PI / 2;
+  if (drag.m === 'rot') { let r = Math.atan2(py - o.y, px - o.x) + H2; const q = Math.round(r / H2) * H2; if (Math.abs(r - q) < .07) r = q; o.r = r }
+  else if (drag.m === 'sz') { const k = Math.max(.1, Math.hypot(px - o.x, py - o.y) / drag.d0), s = drag.s0; if (o.t === 'text') { o.sz = s.sz * k; o.w = s.w * k } else { o.w = s.w * k; o.h = s.h * k } }
+  else { o.x = px - drag.dx; o.y = py - drag.dy; gd.v = Math.abs(o.x - S.W / 2) < 14; gd.h = Math.abs(o.y - S.H / 2) < 14; if (gd.v) o.x = S.W / 2; if (gd.h) o.y = S.H / 2 }
+  render();
+});
+const endDrag = e => { if (e) ptrs.delete(e.pointerId); if (gest) { if (ptrs.size < 2) { gest = null; drag = null; push(); sync(); render() } return } if (!drag) return; drag = null; gd = {}; push(); sync(); render() };
+cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag);
+cv.addEventListener('dblclick', () => { const o = cur(); if (!o || o.t !== 'text') return; if (o.role === 'main') { tab('write'); $('w_tx').focus() } else { tab('style'); $('s_tx').focus() } });
+
+function push() { const j = JSON.stringify(S); if (hist[hp] === j) return; hist = hist.slice(0, hp + 1); hist.push(j); if (hist.length > 60) hist.shift(); hp = hist.length - 1; updHist() }
+function updHist() { $('undo').disabled = hp <= 0; $('redo').disabled = hp >= hist.length - 1 }
+function restore() { S = JSON.parse(hist[hp]); if (!cur()) sel = null; syncAll(); render(); updHist() }
+$('undo').onclick = () => { if (hp > 0) { hp--; restore() } }; $('redo').onclick = () => { if (hp < hist.length - 1) { hp++; restore() } };
+
+function tab(n) { document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === n)); document.querySelectorAll('.pn').forEach(p => p.classList.toggle('on', p.id === n)); sync() }
+$('tabs').onclick = e => { if (e.target.dataset.t) tab(e.target.dataset.t) };
+
+const getSize = o => o.t === 'text' ? o.sz : o.w;
+function setSize(o, v) { if (o.t === 'text') { const k = v / o.sz; o.sz = v; o.w *= k } else { const k = v / o.w; o.w = v; o.h *= k } }
+function sync() {
+  const m = core('main'), n = core('name');
+  if (m) { if ($('w_tx') !== document.activeElement) $('w_tx').value = m.tx === DEFAULT_TX ? '' : m.tx; $('w_f').value = m.f; $('w_c').value = m.c }
+  if (n) $('n_f').value = n.f;
+  const o = cur(); $('qbar').classList.toggle('on', !!o); drawLayers(); $('noSel').style.display = o ? 'none' : ''; $('sty').style.display = o ? 'grid' : 'none'; if (!o) return;
+  document.querySelectorAll('#sty [data-t]').forEach(el => el.style.display = el.dataset.t.split(' ').includes(o.t) ? '' : 'none');
+  SC.forEach(([id, p]) => { const el = $(id); let v = o[p]; if (v === undefined) { if (p === 'lh') v = 1; else if (p === 'cr') v = ''; else if (p === 'fl') v = 0; else return } if (el.type === 'checkbox') el.checked = !!v; else if (el !== document.activeElement) el.value = v });
+  const z = $('s_sz'); z.min = o.t === 'text' ? 20 : 40; z.max = o.t === 'text' ? 400 : 1000; z.value = getSize(o);
+}
+function syncAll() {
+  const m = { p_fmt: S.W === S.H ? 's' : S.H > S.W * 1.5 ? 't' : 'p', p_bk: S.bg.k, p_a: S.bg.a, p_b: S.bg.b, p_ang: S.bg.ang, p_pk: S.pat.k, p_pc: S.pat.c, p_po: S.pat.o, p_fk: S.fr.k, p_fc: S.fr.c, p_dim: S.bg.dim ?? .3 };
+  for (const k in m) $(k).value = m[k]; sync();
+}
+
+/* write tab */
+$('w_tx').addEventListener('input', e => { const m = core('main'); m.tx = e.target.value || DEFAULT_TX; fitMain(); render() });
+$('w_f').addEventListener('change', async e => { const m = core('main'); await loadFont(e.target.value); m.f = e.target.value; fitMain(); push(); render() });
+$('w_c').addEventListener('input', e => { core('main').c = e.target.value; render() });
+$('n_f').addEventListener('change', async e => { await loadFont(e.target.value); core('name').f = e.target.value; push(); render() });
+$('w_name').addEventListener('input', e => { core('name').tx = '— ' + (e.target.value.trim() || 'Your name'); render() });
+$('write').addEventListener('change', push);
+
+/* style tab */
+$('sty').addEventListener('input', async e => {
+  const o = cur(), el = e.target; if (!o) return;
+  if (el.id === 's_sz') setSize(o, +el.value);
+  else { const c = SC.find(s => s[0] === el.id); if (c) { if (el.id === 's_f') await loadFont(el.value); o[c[1]] = el.type === 'checkbox' ? el.checked : el.type === 'range' ? +el.value : el.value } }
+  render();
+});
+$('sty').addEventListener('change', push);
+
+/* design tab */
+$('design').addEventListener('input', e => {
+  const v = id => $(id).value;
+  if (e.target.id === 'p_fmt') { const f = SZ[v('p_fmt')]; S.W = f[0]; S.H = f[1]; layout() }
+  if (e.target.id === 'p_bk' && v('p_bk') === 'img' && !IMGS[S.bg.img]) pickPhoto('bg');
+  S.bg = { k: v('p_bk'), a: v('p_a'), b: v('p_b'), ang: +v('p_ang'), img: S.bg.img, dim: +v('p_dim') }; S.pat = { k: v('p_pk'), c: v('p_pc'), o: +v('p_po') }; S.fr = { k: v('p_fk'), c: v('p_fc') }; render();
+});
+$('design').addEventListener('change', push);
+$('p_reset').onclick = () => { layout(); push(); render() };
+
+/* add tab */
+function addObj(o) { Object.assign(o, { id: nid++, x: S.W / 2, y: S.H / 2, r: 0, op: 1 }); S.o.push(o); sel = o.id; push(); sync(); render() }
+$('a_text').onclick = () => { const m = core('main'); addObj({ t: 'text', tx: 'Your text', f: m ? m.f : 'Poppins', sz: 70, c: m ? m.c : '#ffffff', b: 0, i: 0, al: 'center', sc: '#000000', sw: 0, sh: 0, w: 600 }); tab('style') };
+SHAPES.forEach(([k, n, p]) => {
+  const b = document.createElement('button'); b.setAttribute('aria-label', n); b.title = n; b.innerHTML = '<svg viewBox="0 0 24 24">' + p + '</svg>';
+  b.onclick = () => { const a = core('main') ? core('main').c : '#fbbf24'; addObj({ t: 'shape', sk: k, w: k === 'orn' ? 360 : k === 'line' ? 400 : 260, h: k === 'orn' ? 40 : k === 'line' ? 8 : 260, fill: core('name') ? core('name').c : a, sc: '#000000', sw: 0 }); tab('style') };
+  $('shapes').appendChild(b);
+});
+/* order controls */
+$('b_fw').onclick = () => { const i = S.o.findIndex(o => o.id === sel); if (i >= 0 && i < S.o.length - 1) { [S.o[i], S.o[i + 1]] = [S.o[i + 1], S.o[i]]; push(); render() } };
+$('b_bk').onclick = () => { const i = S.o.findIndex(o => o.id === sel); if (i > 0) { [S.o[i], S.o[i - 1]] = [S.o[i - 1], S.o[i]]; push(); render() } };
+$('b_dup').onclick = () => { const o = cur(); if (!o) return; const c = Object.assign({}, o, { id: nid++, role: undefined, x: o.x + 40, y: o.y + 40 }); S.o.push(c); sel = c.id; push(); sync(); render() };
+function del() { if (sel == null) return; S.o = S.o.filter(o => o.id !== sel); sel = null; push(); sync(); render() }
+$('b_del').onclick = del;
+let nudgeT;
+document.addEventListener('keydown', e => {
+  if (!$('studio').classList.contains('on') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.isContentEditable) return;
+  const mod = e.ctrlKey || e.metaKey;
+  if (e.key === 'Delete' || e.key === 'Backspace') del();
+  else if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); $(e.shiftKey ? 'redo' : 'undo').click() }
+  else if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); $('redo').click() }
+  else if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); $('b_dup').click() }
+  else if (e.key === 'Escape') { sel = null; sync(); render() }
+  else if (e.key.startsWith('Arrow') && cur()) { e.preventDefault(); const o = cur(), d = e.shiftKey ? 20 : 4; if (e.key === 'ArrowLeft') o.x -= d; if (e.key === 'ArrowRight') o.x += d; if (e.key === 'ArrowUp') o.y -= d; if (e.key === 'ArrowDown') o.y += d; render(); clearTimeout(nudgeT); nudgeT = setTimeout(push, 400) }
+});
+
+/* ─── photos, stickers, symbols ─── */
+const loadImg = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('bad image')); im.src = src });
+async function fileToCanvas(file, max) {
+  const url = URL.createObjectURL(file);
+  try { const im = await loadImg(url), k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c; }
+  finally { URL.revokeObjectURL(url) }
+}
+async function takeFile(file, mode) {
+  try {
+    const c = await fileToCanvas(file, mode === 'bg' ? 2000 : 1600), id = 'i' + iid++; IMGS[id] = c;
+    if (mode === 'bg') { S.bg = Object.assign({}, S.bg, { k: 'img', img: id, dim: S.bg.dim ?? .3 }); push(); syncAll(); render(); toast('Background set'); return }
+    let w = Math.min(S.W * .7, c.width), h = w * c.height / c.width; if (h > S.H * .6) { h = S.H * .6; w = h * c.width / c.height }
+    addObj({ t: 'img', img: id, w, h, cr: '', fl: 0, sc: '#ffffff', sw: 0, sh: 0 }); return true;
+  } catch (err) { toast('Couldn\'t open that image.') }
+}
+function pickPhoto(mode) { photoMode = mode; $('fPhoto').value = ''; $('fPhoto').click() }
+$('fPhoto').onchange = async e => { const f = e.target.files[0]; if (!f) return; if (await takeFile(f, photoMode)) tab('style') };
+$('a_photo').onclick = () => pickPhoto('layer'); $('a_bgphoto').onclick = () => pickPhoto('bg'); $('p_bgpick').onclick = () => pickPhoto('bg');
+
+function addSymbol(t) {
+  const m = core('main'); addObj({ t: 'text', tx: t, f: 'Poppins', sz: 150, c: m ? m.c : '#ffffff', b: 0, i: 0, al: 'center', sc: '#000000', sw: 0, sh: 0, w: Math.max(220, Math.min(S.W * .85, [...t].length * 190)) });
+}
+['❝', '❞', '✦', '✧', '❀', '✿', '❁', '❖', '☾', '☀', '♡', '♥', '✶', '❋', '۞', '꧁', '꧂', '❦', '❧', '☘', '❄', '✎',
+ '🌹', '🌙', '✨', '💫', '🔥', '🕊️', '🦋', '🌸', '💔', '❤️', '🖤', '🥀', '🌺', '⭐'].forEach(ch => {
+  const b = document.createElement('button'); b.type = 'button'; b.textContent = ch; b.setAttribute('aria-label', 'Add ' + ch); b.onclick = () => addSymbol(ch); $('syms').appendChild(b);
+});
+
+const stk = $('stk'); let stkT;
+async function drainPad() {
+  const imgs = [...stk.querySelectorAll('img')], txt = stk.textContent.trim();
+  for (const im of imgs) { const src = im.currentSrc || im.src; im.remove();
+    try { const r = await fetch(src); await takeFile(await r.blob(), 'layer') } catch (err) { toast('Couldn\'t read that sticker. Try the Photo button instead.') } }
+  if (txt) addSymbol(txt);
+  stk.innerHTML = '';
+}
+const schedulePad = () => { clearTimeout(stkT); stkT = setTimeout(drainPad, 400) };
+stk.addEventListener('input', e => { if (!e.isComposing) schedulePad() }); stk.addEventListener('compositionend', schedulePad);
+const imageFiles = dt => [...(dt?.files || [])].filter(f => f.type.startsWith('image/'));
+stk.addEventListener('paste', async e => { const fs = imageFiles(e.clipboardData); if (fs.length) { e.preventDefault(); for (const f of fs) await takeFile(f, 'layer') } });
+document.addEventListener('paste', async e => {
+  if (!$('studio').classList.contains('on') || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.isContentEditable) return;
+  const fs = imageFiles(e.clipboardData); if (fs.length) { e.preventDefault(); for (const f of fs) await takeFile(f, 'layer') }
+});
+cv.addEventListener('dragover', e => e.preventDefault());
+cv.addEventListener('drop', async e => { const fs = imageFiles(e.dataTransfer); if (!fs.length) return; e.preventDefault(); for (const f of fs) await takeFile(f, 'layer') });
+
+/* quick tools bar, layers, colour swatches */
+$('qbar').onclick = e => {
+  const b = e.target.closest('button'), o = cur(); if (!b || !o) return; const q = b.dataset.q;
+  if (q === 'edit') { if (o.t === 'text' && o.role === 'main') { tab('write'); $('w_tx').focus() } else { tab('style'); if (o.t === 'text') $('s_tx').focus() } }
+  else if (q === 'dup') $('b_dup').click(); else if (q === 'fw') $('b_fw').click(); else if (q === 'bk') $('b_bk').click(); else if (q === 'del') del();
+  else if (q === 'cx') { o.x = S.W / 2; push(); render() }
+};
+const ROLE = { main: 'Main shayari', quote: 'Quote mark', orn: 'Divider', name: 'Name' };
+function drawLayers() {
+  const L = $('layers'); if (!L || !S) return; L.innerHTML = '';
+  [...S.o].reverse().forEach(o => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'lyr' + (o.id === sel ? ' on' : '');
+    b.textContent = (o.t === 'text' ? 'T   ' : o.t === 'img' ? '🖼   ' : '◆   ') + (ROLE[o.role] || (o.t === 'text' ? String(o.tx).replace(/\s+/g, ' ').slice(0, 26) : o.t === 'img' ? 'Photo' : o.sk));
+    b.onclick = () => { sel = o.id; sync(); render() }; L.appendChild(b);
+  });
+}
+const PAL = ['#ffffff', '#000000', '#fbbf24', '#f97316', '#f87171', '#fb7185', '#a78bfa', '#22d3ee', '#4ade80', '#e5e7eb'];
+document.querySelectorAll('.sws').forEach(d => PAL.forEach(c => {
+  const b = document.createElement('button'); b.type = 'button'; b.style.background = c; b.setAttribute('aria-label', 'Colour ' + c);
+  b.onclick = () => { const i = $(d.dataset.for); i.value = c; i.dispatchEvent(new Event('input', { bubbles: true })); i.dispatchEvent(new Event('change', { bubbles: true })) }; d.appendChild(b);
+}));
+
+/* themes */
+THEMES.forEach((t, idx) => {
+  const b = document.createElement('button'); b.setAttribute('aria-label', t[0]);
+  b.style.background = t[1] === 'solid' ? t[2] : 'linear-gradient(135deg,' + t[2] + ',' + t[3] + ')'; b.innerHTML = '<span>' + t[0] + '</span>';
+  b.onclick = () => {
+    S.bg = { k: t[1], a: t[2], b: t[3], ang: t[4] }; S.fr.c = t[6];
+    S.o.forEach(o => { if (o.role === 'main') o.c = t[5]; if (['quote', 'name'].includes(o.role)) o.c = t[6]; if (o.role === 'orn') o.fill = t[6] });
+    document.querySelectorAll('.themes button').forEach(x => x.classList.toggle('on', x === b)); push(); syncAll(); render();
+  }; $('themes').appendChild(b);
+});
+
+/* font selects */
+function fontOpts(sel) { FONTS.forEach(([g, list]) => { const og = document.createElement('optgroup'); og.label = g; list.forEach(([f]) => { const o = document.createElement('option'); o.value = o.textContent = f; o.style.fontFamily = '"' + f + '"'; og.appendChild(o) }); sel.appendChild(og) }) }
+['w_f', 'n_f', 's_f'].forEach(id => fontOpts($(id)));
+
+/* open / close */
+async function openStudio() {
+  await authReady; if (!me) return toast('Couldn\'t connect. Refresh the page and try again.');
+  injectFonts(); $('studio').classList.add('on'); document.body.style.overflow = 'hidden';
+  if (!built) { built = true; Object.keys(IMGS).forEach(k => delete IMGS[k]); init('p'); sel = null; hist = []; hp = -1; push(); $('w_name').value = (me.user_metadata?.full_name || (me.email || '').split('@')[0] || '').slice(0, 40); core('name').tx = '— ' + ($('w_name').value || 'Your name'); push(); syncAll(); render();
+    loadAllFonts().then(() => { fitMain(); render() }); }
+  render();
+}
+function closeStudio() { if (built && (core('main').tx !== DEFAULT_TX || S.o.length !== 4 || S.bg.k === 'img') && !confirm('Discard this card?')) return; $('studio').classList.remove('on'); document.body.style.overflow = ''; built = false }
+$('upBtn').onclick = openStudio; $('sClose').onclick = closeStudio;
+window.addEventListener('resize', () => { if ($('studio').classList.contains('on')) render() });
+
+/* upload + post */
+function uploadBlob(blob) {
+  return new Promise((res, rej) => {
+    const fd = new FormData(); fd.append('file', blob, 'shayari.jpg'); fd.append('upload_preset', UPLOAD_PRESET);
+    const x = new XMLHttpRequest(); x.open('POST', `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`);
+    x.upload.onprogress = e => { if (e.lengthComputable) $('upBar').style.width = (e.loaded / e.total * 90) + '%' };
+    x.onload = () => { try { const j = JSON.parse(x.responseText); x.status < 300 ? res(j.secure_url) : rej(new Error(j.error?.message || 'Upload failed')) } catch { rej(new Error('Upload failed')) } };
+    x.onerror = () => rej(new Error('Network error')); x.send(fd);
+  });
+}
+$('post').onclick = async () => {
+  const m = core('main'), name = $('w_name').value.trim(); $('wMsg').textContent = '';
+  if (!m.tx.trim() || m.tx === DEFAULT_TX) { tab('write'); $('wMsg').textContent = 'Please write your shayari first.'; return }
+  if (!name) { tab('write'); $('wMsg').textContent = 'Please enter your name.'; return }
+  $('post').disabled = true; sel = null; $('up').classList.add('on'); $('upTxt').textContent = 'Posting your card…'; $('upBar').style.width = '5%';
+  try {
+    render(false);
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .92));
+    const url = await uploadBlob(blob);
+    $('upBar').style.width = '95%';
+    await addDoc(collection(gfyAuth.db, 'shayari'), { uid: me.uid, name, photo: (!me.isAnonymous && safePhoto(me.photoURL)) || '', text: m.tx.slice(0, 800), image: url, ar: +(S.W / S.H).toFixed(4), likes: 0, dislikes: 0, status: 'published', createdAt: new Date().toISOString() });
+    $('upBar').style.width = '100%';
+    $('studio').classList.remove('on'); document.body.style.overflow = ''; built = false;
+    toast('Posted! Your card is on the wall.'); await loadFeed(); window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) { toast('Couldn\'t post: ' + (e.message || 'try again')); render() }
+  $('up').classList.remove('on'); $('post').disabled = false;
+};
+</script>
+</body>
+</html>
